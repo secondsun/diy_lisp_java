@@ -47,7 +47,30 @@ public class EvaluatorTest {
         assertFalse((boolean) run("(eq '(1 2 3) '(1 2 3))"));
     }
 
+    @Test
+    public void evaluateMath() { 
+        assertEquals(4, run("+ 2 2"));
+        assertEquals(1, run("- 2 1"));
+        assertEquals(3, run("/ 6 2"));
+        assertEquals(3, run("/ 7 2"));
+        assertEquals(6, run("* 2 3"));
+        assertEquals(1, run("mod 7 2"));
+        assertEquals(true, run("> 7 2"));
+        assertEquals(false, run("< 7 2"));
+        assertEquals(false, run("> 7 7"));
+    }
     
+    /*
+    assert_equals(4, evaluate(["+", 2, 2], Environment()))
+    assert_equals(1, evaluate(["-", 2, 1], Environment()))
+    assert_equals(3, evaluate(["/", 6, 2], Environment()))
+    assert_equals(3, evaluate(["/", 7, 2], Environment()))
+    assert_equals(6, evaluate(["*", 2, 3], Environment()))
+    assert_equals(1, evaluate(["mod", 7, 2], Environment()))
+    assert_equals(True, evaluate([">", 7, 2], Environment()))
+    assert_equals(False, evaluate([">", 2, 7], Environment()))
+    assert_equals(False, evaluate([">", 7, 7], Environment()))
+    */
     private Object run(String program) {
         return Evaluator.evaluate(parse(program), ENV);
     }
