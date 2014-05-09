@@ -7,7 +7,7 @@
 package net.saga.diy.lisp.parser.operation;
 
 import net.saga.diy.lisp.parser.AST;
-import net.saga.diy.lisp.parser.operation.Operation;
+import net.saga.diy.lisp.parser.types.Environment;
 
 /**
  *
@@ -19,7 +19,7 @@ public class EqOperation implements Operation<Eq2Operation> {
     }
 
     @Override
-    public Eq2Operation operate(AST.Token token) {
+    public Eq2Operation operate(AST.Token token, Environment env) {
         return new Eq2Operation(token);
     }
     

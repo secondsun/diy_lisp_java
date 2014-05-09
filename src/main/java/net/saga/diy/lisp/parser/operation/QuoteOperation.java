@@ -18,11 +18,11 @@ import net.saga.diy.lisp.parser.types.Environment;
 public class QuoteOperation implements Operation<Object> {
 
     @Override
-    public Object operate(AST.Token token) {
+    public Object operate(AST.Token token, Environment env) {
         if (token.type == String.class) {
             return (String) token.value;
         } else {
-            return Evaluator.evaluate(token.tree, new Environment());
+            return Evaluator.evaluate(token.tree, env);
         }
     }
     

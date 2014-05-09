@@ -22,20 +22,20 @@ public class Eq2Operation implements Operation<Boolean> {
     }
 
     @Override
-    public Boolean operate(AST.Token secondToken) {
+    public Boolean operate(AST.Token secondToken, Environment env) {
         AtomOperation isAtom = new AtomOperation();
-        if (isAtom.operate(firstToken) && isAtom.operate(secondToken)) {
+        if (isAtom.operate(firstToken, env) && isAtom.operate(secondToken, env)) {
             Object firstValue;
             Object secondValue;
             if (firstToken.tree == null) {
-                firstValue = (Evaluator.evaluate(new AST(firstToken), new Environment()));
+                firstValue = (Evaluator.evaluate(new AST(firstToken), env));
             } else {
-                firstValue = (Evaluator.evaluate(firstToken.tree, new Environment()));
+                firstValue = (Evaluator.evaluate(firstToken.tree, env));
             }
             if (secondToken.tree == null) {
-                secondValue = (Evaluator.evaluate(new AST(secondToken), new Environment()));
+                secondValue = (Evaluator.evaluate(new AST(secondToken), env));
             } else {
-                secondValue = (Evaluator.evaluate(secondToken.tree, new Environment()));
+                secondValue = (Evaluator.evaluate(secondToken.tree, env));
             }
             return firstValue.equals(secondValue);
         }

@@ -7,6 +7,7 @@
 package net.saga.diy.lisp.parser.operation;
 
 import net.saga.diy.lisp.parser.AST;
+import net.saga.diy.lisp.parser.types.Environment;
 
 /**
  *
@@ -14,6 +15,6 @@ import net.saga.diy.lisp.parser.AST;
  */
 public interface Operation<T> {
 
-    public T operate(AST.Token token);
+    public T operate(AST.Token token, Environment env);
     
 }

@@ -1,67 +1,87 @@
 package net.saga.diy.lisp.parser;
 
-import net.saga.diy.lisp.parser.operation.EqOperation;
-import net.saga.diy.lisp.parser.operation.AtomOperation;
-import net.saga.diy.lisp.parser.operation.QuoteOperation;
-import net.saga.diy.lisp.parser.operation.Operation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import static net.saga.diy.lisp.parser.SpecialTokens.QUOTE;
+import net.saga.diy.lisp.parser.operation.AtomOperation;
+import net.saga.diy.lisp.parser.operation.DefineOperation;
+import net.saga.diy.lisp.parser.operation.EqOperation;
 import net.saga.diy.lisp.parser.operation.IfOperation;
+import net.saga.diy.lisp.parser.operation.LookupOperation;
+import net.saga.diy.lisp.parser.operation.Operation;
+import net.saga.diy.lisp.parser.operation.QuoteOperation;
 import net.saga.diy.lisp.parser.operation.math.MathOperation;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
 
 public class Evaluator {
-    
-    public static Object evaluate(AST ast, Environment env){
+
+    public static Object evaluate(AST ast, Environment env) {
         ArrayList value = new ArrayList();
-        Operation operation= null;
+        Operation operation = null;
         Iterator<AST.Token> tokensItem = ast.tokens.iterator();
-        while(tokensItem.hasNext()) {
+        while (tokensItem.hasNext()) {
             AST.Token token = tokensItem.next();
             if (token.tree != null) {
                 Object res = evaluate(token.tree, env);
                 if (res.getClass().isArray()) {
-                    value.addAll(Arrays.asList((Object[])res));
+                    Object[] arrayRes = (Object[])res;
+                    for (Object arrayObject : arrayRes) {
+                        if (arrayObject == Void.TYPE) {
+                            if (arrayRes.length > 1) {
+                                throw new LispException("Too many arguments " + token);
+                            } 
+                        }
+                    }
+                    value.addAll(Arrays.asList((Object[]) res));
                 } else {
-                    value.add(res);
+                    if (res != Void.TYPE) {
+                        value.add(res);
+                    }
                 }
             } else {
                 if (token.type == String.class) {
                     if (QUOTE.equals(token)) {
                         operation = new QuoteOperation();
-                    
+
                     } else if (SpecialTokens.ATOM.equals(token)) {
                         operation = new AtomOperation();
-                    
+
                     } else if (SpecialTokens.EQ.equals(token)) {
                         operation = new EqOperation();
-                    
+
                     } else if (SpecialTokens.IF.equals(token)) {
                         operation = new IfOperation();
-                    
+
                     } else if (SpecialTokens.MATHS.contains(token)) {
                         operation = new MathOperation(token);
+                    } else if (SpecialTokens.DEFINE.equals(token)) {
+                        operation = new DefineOperation();
                     } else {
-                            throw new LispException("Unexpected token " + token);
+                        operation = new LookupOperation();
+                        value.add(operation.operate(token, env));
+                        continue;
                     }
-                    
-                    Object res = operation.operate(tokensItem.next());
-                    
+
+                    Object res = operation.operate(tokensItem.next(), env);
+
                     while (res instanceof Operation) {
-                        res = ((Operation)res).operate(tokensItem.next());
+                        if (!tokensItem.hasNext()) {
+                            throw new LispException("Missing token");
+                        }
+                        res = ((Operation) res).operate(tokensItem.next(), env);
                     }
-                    
-                    if (res.getClass().isArray()) {
-                        value.addAll(Arrays.asList((Object[])res));
+                    if (res == null) {
+                        value.add(Void.TYPE);
+                    } else if (res.getClass().isArray()) {
+                        value.addAll(Arrays.asList((Object[]) res));
                     } else {
                         value.add(res);
                     }
 
                     operation = null;
-                    
+
                 } else if (token.type == Boolean.class) {
                     value.add(token.value);
                 } else if (token.type == Integer.class) {
@@ -69,20 +89,15 @@ public class Evaluator {
                 }
             }
         }
-        
+
         if (value.size() == 1) {
             return value.get(0);
-        } if (value.isEmpty()) {
+        }
+        if (value.isEmpty()) {
             return Void.class;
         } else {
             return value.toArray();
         }
     }
 
-
-
-    
-    
-    
-    
 }

@@ -7,7 +7,6 @@
 package net.saga.diy.lisp.parser.operation;
 
 import net.saga.diy.lisp.parser.AST;
-import net.saga.diy.lisp.parser.Evaluator;
 import net.saga.diy.lisp.parser.operation.Operation;
 import net.saga.diy.lisp.parser.types.Environment;
 
@@ -15,17 +14,14 @@ import net.saga.diy.lisp.parser.types.Environment;
  *
  * @author summers
  */
-public class AtomOperation implements Operation<Boolean> {
+public class LookupOperation implements Operation {
 
-    public AtomOperation() {
+    public LookupOperation() {
     }
 
     @Override
-    public Boolean operate(AST.Token token, Environment env) {
-        if (token.tree == null) {
-            return !(Evaluator.evaluate(new AST(token), env).getClass().isArray());
-        }
-        return !(Evaluator.evaluate(token.tree, env).getClass().isArray());
+    public Object operate(AST.Token token, Environment env) {
+        return env.lookup((String) token.value);
     }
     
 }
