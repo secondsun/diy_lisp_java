@@ -2,6 +2,7 @@ package net.saga.diy.lisp.parser;
 
 import static net.saga.diy.lisp.parser.Parser.parse;
 import net.saga.diy.lisp.parser.types.Environment;
+import net.saga.diy.lisp.parser.types.LispException;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -59,6 +60,20 @@ public class EvaluatorTest {
         assertEquals(false, run("< 7 2"));
         assertEquals(false, run("> 7 7"));
     }
+    
+    @Test
+    public void evaluateNestedMath() { 
+        assertEquals(8, run("+ 2 (+ 3 3)"));
+        assertEquals(1, run("- (+ 0 2) 1"));
+        assertEquals(30, run("* 10 (/ 6 2)"));
+        
+    }
+    
+    @Test(expected = LispException.class)
+    public void mathOnlyUsesInteger() {
+        assertEquals(false, run("> 7 'foo"));
+    }
+    
     
     /*
     assert_equals(4, evaluate(["+", 2, 2], Environment()))
