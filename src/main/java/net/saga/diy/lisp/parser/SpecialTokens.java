@@ -10,6 +10,7 @@ public final class SpecialTokens {
     public static final AST.Token QUOTE = create(String.class, "quote");
     public static final AST.Token ATOM = create(String.class, "atom");
     public static final AST.Token EQ = create(String.class, "eq");
+    public static final AST.Token IF = create(String.class, "if");
     
     public static final Set<AST.Token> MATHS = new HashSet<>(6);
     static {

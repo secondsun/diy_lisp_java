@@ -86,7 +86,7 @@ public class EvaluatorTest {
     assert_equals(False, evaluate([">", 2, 7], Environment()))
     assert_equals(False, evaluate([">", 7, 7], Environment()))
     */
-    private Object run(String program) {
+    public static Object run(String program) {
         return Evaluator.evaluate(parse(program), ENV);
     }
 }

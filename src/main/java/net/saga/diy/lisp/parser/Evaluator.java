@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import static net.saga.diy.lisp.parser.SpecialTokens.QUOTE;
+import net.saga.diy.lisp.parser.operation.IfOperation;
 import net.saga.diy.lisp.parser.operation.math.MathOperation;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
@@ -37,6 +38,9 @@ public class Evaluator {
                     
                     } else if (SpecialTokens.EQ.equals(token)) {
                         operation = new EqOperation();
+                    
+                    } else if (SpecialTokens.IF.equals(token)) {
+                        operation = new IfOperation();
                     
                     } else if (SpecialTokens.MATHS.contains(token)) {
                         operation = new MathOperation(token);
