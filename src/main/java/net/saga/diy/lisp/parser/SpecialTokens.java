@@ -28,6 +28,7 @@ public final class SpecialTokens {
     public static final AST.Token EQ = create(String.class, "eq");
     public static final AST.Token IF = create(String.class, "if");
     public static final AST.Token DEFINE = create(String.class, "define");
+    public static final AST.Token LAMBDA = create(String.class, "lambda");
 
     public static final Set<AST.Token> MATHS = new HashSet<>(6);
     static {

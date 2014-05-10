@@ -23,6 +23,7 @@ import net.saga.diy.lisp.parser.operation.AtomOperation;
 import net.saga.diy.lisp.parser.operation.DefineOperation;
 import net.saga.diy.lisp.parser.operation.EqOperation;
 import net.saga.diy.lisp.parser.operation.IfOperation;
+import net.saga.diy.lisp.parser.operation.LambdaOperation;
 import net.saga.diy.lisp.parser.operation.LookupOperation;
 import net.saga.diy.lisp.parser.operation.Operation;
 import net.saga.diy.lisp.parser.operation.QuoteOperation;
@@ -73,7 +74,9 @@ public class Evaluator {
                         operation = new MathOperation(token);
                     } else if (SpecialTokens.DEFINE.equals(token)) {
                         operation = new DefineOperation();
-                    } else {
+                    } else if (SpecialTokens.LAMBDA.equals(token)) {
+                        operation = new LambdaOperation();
+                    }else {
                         operation = new LookupOperation();
                         value.add(operation.operate(token, env));
                         continue;
