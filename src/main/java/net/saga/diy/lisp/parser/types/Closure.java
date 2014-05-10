@@ -16,10 +16,42 @@
 
 package net.saga.diy.lisp.parser.types;
 
-/**
- *
- * @author summers
- */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import net.saga.diy.lisp.parser.AST;
+import net.saga.diy.lisp.parser.AST.Token;
+
 public class Closure {
+
+    private final List<String> params = new ArrayList<String>();
+    private final Environment env;
+    private final AST.Token body;
+    
+    public Closure(Environment env, Token params, Token body) {
+        this.env = env;
+        
+        if (params.tree == null) {
+            throw new LispException("params not a list");
+        }
+        
+        params.tree.tokens.forEach((varToken)->this.params.add((String) varToken.value));
+        
+        this.body = body;
+    }
+    
+    public Environment getEnv() {
+        return env;
+    }
+
+    public List<String> getParams() {
+        return new ArrayList<>(params);
+    }
+
+    public Token getBody() {
+        return body;
+    }
+    
+    
     
 }

@@ -21,6 +21,7 @@ import java.util.List;
 import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
+import net.saga.diy.lisp.parser.types.LispException;
 
 /**
  *
@@ -30,8 +31,8 @@ public class LambdaOperation implements Operation<Operation<Closure>>{
 
     @Override
     public Operation<Closure> operate(AST.Token token, Environment env) {
-        final List<String> params = extractParams(token);
-        return ((bodyToken, bodyEnv) -> {return new Closure();});
+        extractParams(token);
+        return ((bodyToken, bodyEnv) -> {return new Closure(bodyEnv, token, bodyToken);});
     }
 
     private List<String> extractParams(AST.Token token) {
@@ -42,8 +43,7 @@ public class LambdaOperation implements Operation<Operation<Closure>>{
                 params.add((String)varToken.value);
             });
         } else {
-                assert token.type == String.class;
-                params.add((String)token.value);
+               throw new LispException("Lambda vars not list");
         }
         return params;
     }
