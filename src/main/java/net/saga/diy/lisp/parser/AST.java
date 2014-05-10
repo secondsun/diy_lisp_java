@@ -1,7 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright Summers Pittman, and individual contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package net.saga.diy.lisp.parser;
 
@@ -12,19 +22,20 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * 
  * @author summers
  */
 public class AST implements Iterable<AST.Token> {
 
     public List<Token> tokens = new ArrayList<>();
 
-    public AST() {}
-    
+    public AST() {
+    }
+
     public AST(Token... tokens) {
         this.tokens.addAll(Arrays.asList(tokens));
     }
-    
+
     @Override
     public Iterator<Token> iterator() {
 
@@ -95,7 +106,7 @@ public class AST implements Iterable<AST.Token> {
     public String toString() {
         return toString(0);
     }
-    
+
     private String toString(final int indent) {
         
         final StringBuffer sb = new StringBuffer();
@@ -118,9 +129,6 @@ public class AST implements Iterable<AST.Token> {
         sb.append("}");
         return sb.toString();
     }
-
-    
-    
 
     public static class Token {
 
@@ -166,7 +174,7 @@ public class AST implements Iterable<AST.Token> {
             token.tree = ast;
             return token;
         }
-        
+
         public static Token create(Class<?> type, Object value) {
             Token token = new Token();
             token.tree = null;
@@ -179,7 +187,7 @@ public class AST implements Iterable<AST.Token> {
         public String toString() {
             return "Token{" + "type=" + type + ", value=" + value + ", tree=" + tree + '}';
         }
-        
+
     }
 
 }

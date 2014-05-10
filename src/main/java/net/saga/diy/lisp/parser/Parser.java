@@ -1,3 +1,18 @@
+/**
+ * Copyright Summers Pittman, and individual contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.saga.diy.lisp.parser;
 
 import net.saga.diy.lisp.parser.types.LispException;
@@ -11,7 +26,7 @@ import static net.saga.diy.lisp.parser.AST.Token.create;
 public class Parser {
 
     private static final Pattern PATTERN = Pattern.compile("^[^\\s)']+");
-    
+
     public static AST parse(String source) {
         source = source.trim();
         source = removeComments(source);
@@ -30,7 +45,7 @@ public class Parser {
                     ast.tokens.add(create(parse(expression.substring(1, expression.length() - 1))));
                 } else if (expression.startsWith(")")) {
                     throw new LispException("Expected EOF");
-                } else {                
+                } else {
                     ast.tokens.add(create(String.class, expression));
                 }
             }
@@ -60,36 +75,36 @@ public class Parser {
         char next = buff.get();
         while (next == ' ' || next == '\n') {
             buff.mark();
-            next = buff.get();    
+            next = buff.get();
         }
         buff.reset();
         StringBuilder expr = new StringBuilder();
         char[] arr;
         switch (next) {
-            case '\'':
-                buff.get();
-                expr.append("(quote ").append(nextExpression(buff)).append(")");
-                
-                break;
-            case '(':
-                int last = findMatchingParen(buff) + 1;
-                arr = new char[last];
-                buff.get(arr, 0, last);
-                expr.append(arr);
-                
-                break;
-            default:
-                String remaining = buff.toString();
-                Matcher match = PATTERN.matcher(remaining);
-                if (!match.lookingAt()) {
-                    throw new LispException("Illegal start of expression");
-                }
-                int end = match.end();
-                arr = new char[end];
-                buff.get(arr, 0, end);
-                expr.append(arr);
-                
-                break;
+        case '\'':
+            buff.get();
+            expr.append("(quote ").append(nextExpression(buff)).append(")");
+
+            break;
+        case '(':
+            int last = findMatchingParen(buff) + 1;
+            arr = new char[last];
+            buff.get(arr, 0, last);
+            expr.append(arr);
+
+            break;
+        default:
+            String remaining = buff.toString();
+            Matcher match = PATTERN.matcher(remaining);
+            if (!match.lookingAt()) {
+                throw new LispException("Illegal start of expression");
+            }
+            int end = match.end();
+            arr = new char[end];
+            buff.get(arr, 0, end);
+            expr.append(arr);
+
+            break;
         }
 
         return expr.toString();

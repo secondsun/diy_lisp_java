@@ -1,7 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright Summers Pittman, and individual contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package net.saga.diy.lisp.parser;
 
@@ -134,60 +144,59 @@ public class ParserTest {
     @Test
     public void testLargeFile() {
         AST ast = parse(" "
-        + "(define fact\n"
+                + "(define fact\n"
                 + ";; Factorial function\n"
-            + "(lambda (n)\n"
+                + "(lambda (n)\n"
                 + "(if (<= n 1)\n"
-                    + "1 ; Factorial of 0 is 1, and we deny\n"
-                    + "; the existence of negative numbers\n"
-                    + "(* n (fact (- n 1))))))");
-        
-        AST expected = 
-        new AST(create(
-                new AST(create(String.class, "define"), create (String.class, "fact"), create(
-                        new AST( create(String.class, "lambda"), create(
-                                new AST(create(String.class, "n"))
-                        ), create(
-                                new AST(create(String.class, "if"), create(
-                                    new AST(create(String.class, "<="), create(String.class, "n"), create(Integer.class, 1))
-                                ), create(Integer.class, 1), create(
-                                        new AST(create(String.class, "*"), create(String.class, "n"), create(new AST(create(String.class, "fact"), create(
-                                                new AST(create(String.class, "-"), create(String.class, "n"), create(Integer.class, 1))))))
-                                )))))))
-        );
-        
+                + "1 ; Factorial of 0 is 1, and we deny\n"
+                + "; the existence of negative numbers\n"
+                + "(* n (fact (- n 1))))))");
+
+        AST expected =
+                new AST(create(
+                        new AST(create(String.class, "define"), create(String.class, "fact"), create(
+                                new AST(create(String.class, "lambda"), create(
+                                        new AST(create(String.class, "n"))
+                                        ), create(
+                                        new AST(create(String.class, "if"), create(
+                                                new AST(create(String.class, "<="), create(String.class, "n"), create(Integer.class, 1))
+                                                ), create(Integer.class, 1), create(
+                                                new AST(create(String.class, "*"), create(String.class, "n"), create(new AST(create(String.class, "fact"), create(
+                                                        new AST(create(String.class, "-"), create(String.class, "n"), create(Integer.class, 1))))))
+                                                )))))))
+                );
+
         Assert.assertEquals(expected, ast);
-        
+
     }
-    
+
     @Test
     public void testQuotes() {
         AST ast = parse("(foo 'nil)");
-        
-        AST expected = 
+
+        AST expected =
                 new AST(create(
                         new AST(create(String.class, "foo"), create(
                                 new AST(QUOTE, create(String.class, "nil"))
-                        ))
-                ));
-        
+                                ))
+                        ));
+
         Assert.assertEquals(expected, ast);
 
-        
     }
-    
+
     @Test
     public void testNestedQuotes() {
-        AST ast = parse("''''foo"); 
+        AST ast = parse("''''foo");
         AST expected = new AST(create(
-                            new AST(QUOTE, create(
+                new AST(QUOTE, create(
+                        new AST(QUOTE, create(
                                 new AST(QUOTE, create(
-                                        new AST(QUOTE, create(
-                                            new AST(QUOTE, create(String.class, "foo"))
+                                        new AST(QUOTE, create(String.class, "foo"))
                                         ))
                                 ))
-                            )))
-                            );
+                        )))
+                );
         Assert.assertEquals(expected, ast);
     }
 

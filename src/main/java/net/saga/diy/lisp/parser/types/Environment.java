@@ -1,7 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright Summers Pittman, and individual contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package net.saga.diy.lisp.parser.types;
 
@@ -9,7 +19,7 @@ import java.util.HashMap;
 import static net.saga.diy.lisp.parser.types.Utils.getOrThrow;
 
 /**
- *
+ * 
  * @author summers
  */
 public class Environment {
@@ -27,11 +37,11 @@ public class Environment {
             this.variables = new HashMap<>(variables);
         }
     }
-    
+
     public Object lookup(String varName) {
-        return getOrThrow(variables,varName);
+        return getOrThrow(variables, varName);
     }
-    
+
     public Environment extend(String name, Object value) {
         HashMap<String, Object> newVars = new HashMap<>(variables);
         newVars.put(name, value);
@@ -45,5 +55,4 @@ public class Environment {
         variables.put(name, value);
     }
 
-    
 }

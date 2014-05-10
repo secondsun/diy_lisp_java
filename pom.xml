@@ -11,6 +11,7 @@
         <license.plugin.version>1.9.0</license.plugin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <netbeans.hint.license>true</netbeans.hint.license>
     </properties>
     
     <dependencies>
