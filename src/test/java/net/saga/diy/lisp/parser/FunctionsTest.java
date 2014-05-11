@@ -148,22 +148,51 @@ public class FunctionsTest {
                 + "wont-evaluate-this-branch\n"
                 + "(lambda (x) (+ x y)))\n"
                 + "2)");
-        
+
         Environment env = new Environment();
         env.set("y", 3);
         assertEquals(5, evaluate(ast, env));
     }
 
-    @Test(expected = LispException.class) 
+    @Test(expected = LispException.class)
     public void testCallingAtomRaisesException1() {
-         evaluate(parse("(#t 'foo 'bar)"), new Environment());
+        evaluate(parse("(#t 'foo 'bar)"), new Environment());
     }
-    
-    @Test(expected = LispException.class) 
+
+    @Test(expected = LispException.class)
     public void testCallingAtomRaisesException2() {
-         evaluate(parse("(42)"), new Environment());
+        evaluate(parse("(42)"), new Environment());
     }
-    
+
+    @Test
+    public void testArgumentsAreEvaluated() {
+        assertEquals(3, evaluate(parse("((lambda (x) x) (+ 1 2))"), new Environment()));
+    }
+
+    @Test(expected = LispException.class)
+    public void testCallingWithWrongNumberOfArguments() {
+        Environment env = new Environment();
+
+        evaluate(parse("(define fn (lambda (p1 p2) 'whatwever))"), env);
+
+        evaluate(parse("(fn 1 2 3)"), env);
+    }
+
+    @Test
+    public void testRecursion() {
+        Environment env = new Environment();
+
+        evaluate(parse(" (define my-fn\n"
+                + ";; A meaningless, but recursive, function\n"
+                + "(lambda (x)\n"
+                + "(if (eq x 0)\n"
+                + "42\n"
+                + "(my-fn (- x 1)))))"), env);
+
+        assertEquals(42, evaluate(parse("(my-fn 0)"), env));
+        assertEquals(42, evaluate(parse("(my-fn 10)"), env));
+    }
+
     private <K, V> Map.Entry<K, V> entry(K key, V value) {
         return new SimpleEntry<K, V>(key, value);
     }
