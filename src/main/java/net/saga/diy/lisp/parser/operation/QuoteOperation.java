@@ -17,8 +17,6 @@
 package net.saga.diy.lisp.parser.operation;
 
 import net.saga.diy.lisp.parser.AST;
-import net.saga.diy.lisp.parser.Evaluator;
-import net.saga.diy.lisp.parser.operation.Operation;
 import net.saga.diy.lisp.parser.types.Environment;
 
 /**
@@ -32,7 +30,7 @@ public class QuoteOperation implements Operation<Object> {
         if (token.type == String.class) {
             return (String) token.value;
         } else {
-            return Evaluator.evaluate(token.tree, env);
+            return token.tree;
         }
     }
 

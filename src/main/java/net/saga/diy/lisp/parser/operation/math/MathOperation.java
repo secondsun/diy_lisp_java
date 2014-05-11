@@ -73,6 +73,10 @@ public class MathOperation implements Operation<Operation> {
             return (Integer) token.value;
         }
 
+        if (token.type == String.class) {
+            return (Integer) env.lookup((String) token.value);
+        }
+        
         if (token.tree != null) {
             Object result = Evaluator.evaluate(token.tree, env);
             if (result instanceof Integer) {

@@ -42,7 +42,7 @@ public class EvaluatorTest {
     @Test
     public void evaluateQuote() {
         assertEquals("foo", run("( quote foo)"));
-        assertArrayEquals(new Object[] { 1, 2, false }, (Object[]) run("( quote (1 2 #f))"));
+        assertEquals(parse("1 2 #f"), run("(quote (1 2 #f))"));
     }
 
     @Test

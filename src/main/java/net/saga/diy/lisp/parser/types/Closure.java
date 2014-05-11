@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.saga.diy.lisp.parser.types;
 
 import java.util.ArrayList;
@@ -21,25 +20,29 @@ import java.util.Collections;
 import java.util.List;
 import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.AST.Token;
+import static net.saga.diy.lisp.parser.AST.Token.create;
 
 public class Closure {
 
     private final List<String> params = new ArrayList<String>();
     private final Environment env;
-    private final AST.Token body;
-    
+    private final AST body;
+
     public Closure(Environment env, Token params, Token body) {
         this.env = env;
-        
+
         if (params.tree == null) {
             throw new LispException("params not a list");
         }
-        
-        params.tree.tokens.forEach((varToken)->this.params.add((String) varToken.value));
-        
-        this.body = body;
+
+        params.tree.tokens.forEach((varToken) -> this.params.add((String) varToken.value));
+        if (body.tree == null) {
+            this.body = new AST(create(body.type, body.value));
+        } else {
+            this.body = body.tree;
+        }
     }
-    
+
     public Environment getEnv() {
         return env;
     }
@@ -48,10 +51,8 @@ public class Closure {
         return new ArrayList<>(params);
     }
 
-    public Token getBody() {
+    public AST getBody() {
         return body;
     }
-    
-    
-    
+
 }

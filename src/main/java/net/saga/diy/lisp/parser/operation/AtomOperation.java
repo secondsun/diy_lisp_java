@@ -17,8 +17,7 @@
 package net.saga.diy.lisp.parser.operation;
 
 import net.saga.diy.lisp.parser.AST;
-import net.saga.diy.lisp.parser.Evaluator;
-import net.saga.diy.lisp.parser.operation.Operation;
+import net.saga.diy.lisp.parser.SpecialTokens;
 import net.saga.diy.lisp.parser.types.Environment;
 
 /**
@@ -30,12 +29,20 @@ public class AtomOperation implements Operation<Boolean> {
     public AtomOperation() {
     }
 
+    /*
+     * I made a mistake in how I parse "'" and it creates a new AST.  It makes 
+     * some operations easier, but atoms now have to make sure a list isn't being
+     * quoted.
+     * 
+     */
     @Override
     public Boolean operate(AST.Token token, Environment env) {
         if (token.tree == null) {
-            return !(Evaluator.evaluate(new AST(token), env).getClass().isArray());
+            return true;
         }
-        return !(Evaluator.evaluate(token.tree, env).getClass().isArray());
+        return SpecialTokens.QUOTE.equals(token.tree.tokens.get(0)) && 
+               token.tree.tokens.size() == 2 && 
+                token.tree.tokens.get(1).tree == null;
     }
 
 }

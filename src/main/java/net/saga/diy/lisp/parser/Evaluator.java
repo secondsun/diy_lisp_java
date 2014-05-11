@@ -18,6 +18,9 @@ package net.saga.diy.lisp.parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import net.saga.diy.lisp.parser.AST.Token;
+import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.parser.operation.AtomOperation;
 import net.saga.diy.lisp.parser.operation.DefineOperation;
@@ -28,6 +31,7 @@ import net.saga.diy.lisp.parser.operation.LookupOperation;
 import net.saga.diy.lisp.parser.operation.Operation;
 import net.saga.diy.lisp.parser.operation.QuoteOperation;
 import net.saga.diy.lisp.parser.operation.math.MathOperation;
+import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
 
@@ -40,6 +44,7 @@ public class Evaluator {
         while (tokensItem.hasNext()) {
             AST.Token token = tokensItem.next();
             if (token.tree != null) {
+                validateTreeForEvaluation(token.tree, env);
                 Object res = evaluate(token.tree, env);
                 if (res.getClass().isArray()) {
                     Object[] arrayRes = (Object[]) res;
@@ -76,10 +81,16 @@ public class Evaluator {
                         operation = new DefineOperation();
                     } else if (SpecialTokens.LAMBDA.equals(token)) {
                         operation = new LambdaOperation();
-                    }else {
+                    } else {
                         operation = new LookupOperation();
-                        value.add(operation.operate(token, env));
-                        continue;
+                        Object result = operation.operate(token, env);
+                        if (!(result instanceof Operation)) {
+                            value.add(result);
+                            continue;
+                        } else {
+                            operation = (Operation) result;
+                        }
+                        
                     }
 
                     Object res = operation.operate(tokensItem.next(), env);
@@ -104,6 +115,13 @@ public class Evaluator {
                     value.add(token.value);
                 } else if (token.type == Integer.class) {
                     value.add(token.value);
+                } else if (token.type == Closure.class) {
+                    
+                    Closure closure = (Closure)token.value;
+                    Environment envClosure = new Environment(closure.getEnv());
+                    List<String> vars = closure.getParams();
+                    vars.forEach(var -> envClosure.set(var, evaluate(new AST(tokensItem.next()), env)));
+                    value.add(evaluate((closure).getBody(), envClosure));
                 }
             }
         }
@@ -114,7 +132,68 @@ public class Evaluator {
         if (value.isEmpty()) {
             return Void.class;
         } else {
-            return value.toArray();
+            
+            Object[] valueArray = value.toArray();
+            if (valueArray[0] instanceof Closure) {
+                List<Token> closureTokens = new ArrayList<>(valueArray.length);
+                for (Object obj : valueArray) {
+                    closureTokens.add(create(obj.getClass(), obj));
+                }
+                
+                return evaluate(new AST(closureTokens.toArray(new Token[0])), env);
+                
+            } else {
+                throw new LispException("Illegal tokens");
+                //return valueArray;
+            }
+        }
+    }
+
+    /**
+     * 
+     * Make sure the AST is a function call or a call to a special form.
+     * 
+     * @param tree 
+     */
+    private static void validateTreeForEvaluation(AST tree, Environment env) {
+        Token token = tree.tokens.get(0);
+        if (token.tree != null) {//call to another list
+            return;
+        } else {
+            if (token.type == String.class) {
+                if (QUOTE.equals(token)) {
+                    return;
+                } else if (SpecialTokens.ATOM.equals(token)) {
+                    return;
+                } else if (SpecialTokens.EQ.equals(token)) {
+                    return;
+                } else if (SpecialTokens.IF.equals(token)) {
+                    return;
+                } else if (SpecialTokens.MATHS.contains(token)) {
+                    return;
+                } else if (SpecialTokens.DEFINE.equals(token)) {
+                    return;
+                } else if (SpecialTokens.LAMBDA.equals(token)) {
+                    return;
+                } else {
+                    LookupOperation operation = new LookupOperation();
+                    Object result = operation.operate(token, env);
+                    if (!(result instanceof Operation)) {
+                        throw new LispException("List is not a function call");
+                    } else {
+                        return;
+                    }
+
+                }
+
+
+            } else if (token.type == Boolean.class) {
+                throw new LispException("List is not a function call");
+            } else if (token.type == Integer.class) {
+                throw new LispException("List is not a function call");
+            } else if (token.type == Closure.class) {
+                return;
+            }
         }
     }
 
