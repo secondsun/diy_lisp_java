@@ -1,17 +1,17 @@
 /**
  * Copyright Summers Pittman, and individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package net.saga.diy.lisp.parser;
 
@@ -23,6 +23,7 @@ import net.saga.diy.lisp.parser.AST.Token;
 import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.parser.operation.AtomOperation;
+import net.saga.diy.lisp.parser.operation.ConsOperation;
 import net.saga.diy.lisp.parser.operation.DefineOperation;
 import net.saga.diy.lisp.parser.operation.EqOperation;
 import net.saga.diy.lisp.parser.operation.IfOperation;
@@ -36,6 +37,24 @@ import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
 
 public class Evaluator {
+
+    public static Object evaluate(Token token, Environment env) {
+        if (token.tree != null) {
+            validateTreeForEvaluation(token.tree, env);
+            return evaluate(token.tree, env);
+        }else if (token.type == Boolean.class) {
+            return  (token.value);
+        } else if (token.type == Integer.class) {
+            return (token.value);
+        } else if (token.type == String.class) {
+            Object value = env.lookup((String) token.value);
+            if (value != null) {
+                return value;
+            }
+            
+        }
+        throw new LispException("Illegal token");            
+    }
 
     public static Object evaluate(AST ast, Environment env) {
         ArrayList value = new ArrayList();
@@ -79,6 +98,8 @@ public class Evaluator {
                         operation = new MathOperation(token);
                     } else if (SpecialTokens.DEFINE.equals(token)) {
                         operation = new DefineOperation();
+                    } else if (SpecialTokens.CONS.equals(token)) {
+                        operation = new ConsOperation();
                     } else if (SpecialTokens.LAMBDA.equals(token)) {
                         operation = new LambdaOperation();
                     } else {
@@ -90,7 +111,7 @@ public class Evaluator {
                         } else {
                             operation = (Operation) result;
                         }
-                        
+
                     }
 
                     Object res = operation.operate(tokensItem.next(), env);
@@ -116,8 +137,8 @@ public class Evaluator {
                 } else if (token.type == Integer.class) {
                     value.add(token.value);
                 } else if (token.type == Closure.class) {
-                    
-                    Closure closure = (Closure)token.value;
+
+                    Closure closure = (Closure) token.value;
                     Environment envClosure = new Environment(closure.getEnv());
                     List<String> vars = closure.getParams();
                     vars.forEach(var -> envClosure.set(var, evaluate(new AST(tokensItem.next()), env)));
@@ -132,16 +153,16 @@ public class Evaluator {
         if (value.isEmpty()) {
             return Void.class;
         } else {
-            
+
             Object[] valueArray = value.toArray();
             if (valueArray[0] instanceof Closure) {
                 List<Token> closureTokens = new ArrayList<>(valueArray.length);
                 for (Object obj : valueArray) {
                     closureTokens.add(create(obj.getClass(), obj));
                 }
-                
+
                 return evaluate(new AST(closureTokens.toArray(new Token[0])), env);
-                
+
             } else {
                 throw new LispException("Illegal tokens");
                 //return valueArray;
@@ -150,10 +171,10 @@ public class Evaluator {
     }
 
     /**
-     * 
+     *
      * Make sure the AST is a function call or a call to a special form.
-     * 
-     * @param tree 
+     *
+     * @param tree
      */
     private static void validateTreeForEvaluation(AST tree, Environment env) {
         Token token = tree.tokens.get(0);
@@ -175,6 +196,8 @@ public class Evaluator {
                     return;
                 } else if (SpecialTokens.LAMBDA.equals(token)) {
                     return;
+                } else if (SpecialTokens.CONS.equals(token)) {
+                    return;
                 } else {
                     LookupOperation operation = new LookupOperation();
                     Object result = operation.operate(token, env);
@@ -185,7 +208,6 @@ public class Evaluator {
                     }
 
                 }
-
 
             } else if (token.type == Boolean.class) {
                 throw new LispException("List is not a function call");

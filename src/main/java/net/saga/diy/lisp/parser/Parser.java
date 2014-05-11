@@ -1,57 +1,74 @@
 /**
  * Copyright Summers Pittman, and individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package net.saga.diy.lisp.parser;
 
-import net.saga.diy.lisp.parser.types.LispException;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.saga.diy.lisp.parser.AST.Token;
 import static net.saga.diy.lisp.parser.AST.Token.create;
+import static net.saga.diy.lisp.parser.AST.Token.create;
+import net.saga.diy.lisp.parser.types.LispException;
 
 public class Parser {
 
     private static final Pattern PATTERN = Pattern.compile("^[^\\s)']+");
 
-    public static AST parse(String source) {
+    public static Token parse(String source) {
         source = source.trim();
         source = removeComments(source);
 
-        AST ast = new AST();
+        Token toReturn;
 
         List<String> expressions = splitExpressions(source);
 
         for (String expression : expressions) {
             if (expression.matches("#\\w")) {
-                ast.tokens.add(create(Boolean.class, expression.charAt(1) == 't'));
+                if (expressions.size() > 1) {
+                    throw new LispException("Invalid Expression");
+                }
+                return create(Boolean.class, expression.charAt(1) == 't');
             } else if (expression.matches("\\d+")) {
-                ast.tokens.add(create(Integer.class, Integer.parseInt(expression)));
+                if (expressions.size() > 1) {
+                    throw new LispException("Invalid Expression");
+                }
+
+                return (create(Integer.class, Integer.parseInt(expression)));
             } else {
                 if (expression.startsWith("(")) {
-                    ast.tokens.add(create(parse(expression.substring(1, expression.length() - 1))));
+                    String subSource = expression.substring(1, expression.length() - 1);
+                    
+                    List<Token> tokens = new ArrayList<>();
+                    
+                    splitExpressions(subSource).stream().forEach((subExpression) -> {
+                        tokens.add(parse(subExpression));
+                    });
+                    
+                    return create(new AST(tokens.toArray(new Token[tokens.size()])));
                 } else if (expression.startsWith(")")) {
                     throw new LispException("Expected EOF");
                 } else {
-                    ast.tokens.add(create(String.class, expression));
+                    return (create(String.class, expression));
                 }
             }
         }
+        throw new LispException("Expected EOF");
 
-        return ast;
     }
 
     private static String removeComments(String source) {
@@ -81,30 +98,30 @@ public class Parser {
         StringBuilder expr = new StringBuilder();
         char[] arr;
         switch (next) {
-        case '\'':
-            buff.get();
-            expr.append("(quote ").append(nextExpression(buff)).append(")");
+            case '\'':
+                buff.get();
+                expr.append("(quote ").append(nextExpression(buff)).append(")");
 
-            break;
-        case '(':
-            int last = findMatchingParen(buff) + 1;
-            arr = new char[last];
-            buff.get(arr, 0, last);
-            expr.append(arr);
+                break;
+            case '(':
+                int last = findMatchingParen(buff) + 1;
+                arr = new char[last];
+                buff.get(arr, 0, last);
+                expr.append(arr);
 
-            break;
-        default:
-            String remaining = buff.toString();
-            Matcher match = PATTERN.matcher(remaining);
-            if (!match.lookingAt()) {
-                throw new LispException("Illegal start of expression");
-            }
-            int end = match.end();
-            arr = new char[end];
-            buff.get(arr, 0, end);
-            expr.append(arr);
+                break;
+            default:
+                String remaining = buff.toString();
+                Matcher match = PATTERN.matcher(remaining);
+                if (!match.lookingAt()) {
+                    throw new LispException("Illegal start of expression");
+                }
+                int end = match.end();
+                arr = new char[end];
+                buff.get(arr, 0, end);
+                expr.append(arr);
 
-            break;
+                break;
         }
 
         return expr.toString();

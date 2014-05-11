@@ -15,12 +15,15 @@
  */
 package net.saga.diy.lisp.parser;
 
+import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.Parser.parse;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -42,7 +45,7 @@ public class EvaluatorTest {
     @Test
     public void evaluateQuote() {
         assertEquals("foo", run("( quote foo)"));
-        assertEquals(parse("1 2 #f"), run("(quote (1 2 #f))"));
+        assertEquals(new AST(create(Integer.class, 1),  create(Integer.class, 2),create(Boolean.class, false)), run("(quote (1 2 #f))"));
     }
 
     @Test
@@ -65,22 +68,22 @@ public class EvaluatorTest {
 
     @Test
     public void evaluateMath() {
-        assertEquals(4, run("+ 2 2"));
-        assertEquals(1, run("- 2 1"));
-        assertEquals(3, run("/ 6 2"));
-        assertEquals(3, run("/ 7 2"));
-        assertEquals(6, run("* 2 3"));
-        assertEquals(1, run("mod 7 2"));
-        assertEquals(true, run("> 7 2"));
-        assertEquals(false, run("< 7 2"));
-        assertEquals(false, run("> 7 7"));
+        assertEquals(4, run("(+ 2 2)"));
+        assertEquals(1, run("(- 2 1)"));
+        assertEquals(3, run("(/ 6 2)"));
+        assertEquals(3, run("(/ 7 2)"));
+        assertEquals(6, run("(* 2 3)"));
+        assertEquals(1, run("(mod 7 2)"));
+        assertEquals(true, run("(> 7 2)"));
+        assertEquals(false, run("(< 7 2)"));
+        assertEquals(false, run("(> 7 7)"));
     }
 
     @Test
     public void evaluateNestedMath() {
-        assertEquals(8, run("+ 2 (+ 3 3)"));
-        assertEquals(1, run("- (+ 0 2) 1"));
-        assertEquals(30, run("* 10 (/ 6 2)"));
+        assertEquals(8, run("(+ 2 (+ 3 3))"));
+        assertEquals(1, run("(- (+ 0 2) 1)"));
+        assertEquals(30, run("(* 10 (/ 6 2))"));
 
     }
 

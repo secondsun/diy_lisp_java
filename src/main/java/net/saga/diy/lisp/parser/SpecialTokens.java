@@ -17,6 +17,7 @@ package net.saga.diy.lisp.parser;
 
 import java.util.HashSet;
 import java.util.Set;
+import net.saga.diy.lisp.parser.AST.Token;
 import static net.saga.diy.lisp.parser.AST.Token.create;
 
 public final class SpecialTokens {
@@ -29,8 +30,11 @@ public final class SpecialTokens {
     public static final AST.Token IF = create(String.class, "if");
     public static final AST.Token DEFINE = create(String.class, "define");
     public static final AST.Token LAMBDA = create(String.class, "lambda");
+    public static final AST.Token CONS = create(String.class, "cons");
 
     public static final Set<AST.Token> MATHS = new HashSet<>(6);
+    public static final Set<Token> ALL_TOKENS = new HashSet<Token>();
+    
     static {
         MATHS.add(create(String.class, "+"));
         MATHS.add(create(String.class, "-"));
@@ -39,6 +43,18 @@ public final class SpecialTokens {
         MATHS.add(create(String.class, "mod"));
         MATHS.add(create(String.class, "<"));
         MATHS.add(create(String.class, ">"));
+        
+        ALL_TOKENS.add(QUOTE);
+        ALL_TOKENS.add(ATOM);
+        ALL_TOKENS.add(EQ);
+        ALL_TOKENS.add(IF);
+        ALL_TOKENS.add(DEFINE);
+        ALL_TOKENS.add(LAMBDA);
+        ALL_TOKENS.add(CONS);
+        ALL_TOKENS.addAll(MATHS);
+        
     }
+    
+    
 
 }

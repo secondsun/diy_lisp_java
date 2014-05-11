@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.saga.diy.lisp.parser.AST.Token;
 import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.Evaluator.evaluate;
 import static net.saga.diy.lisp.parser.Parser.parse;
@@ -36,7 +37,7 @@ public class FunctionsTest {
 
     @Test
     public void testLambdaEvaluateToLambda() {
-        AST ast = parse("lambda () 42");
+        Token ast = parse("(lambda () 42)");
         Closure closure = (Closure) evaluate(ast, new Environment());
         assertTrue(closure instanceof Closure);
     }
@@ -45,14 +46,14 @@ public class FunctionsTest {
     public void testLambdaKeepsDefiningEnv() {
 
         Environment env = new Environment(map(entry("foo", 1), entry("bar", 2)));
-        AST ast = parse("lambda () 42");
+        Token ast = parse("(lambda () 42)");
         Closure closure = (Closure) evaluate(ast, env);
         assertEquals(env, closure.getEnv());
     }
 
     @Test
     public void testLambdaClosureHoldsFunction() {
-        AST ast = parse("(lambda (x y) (+ x y))");
+        Token ast = parse("(lambda (x y) (+ x y))");
         Closure closure = (Closure) evaluate(ast, new Environment());
 
         AST expected = new AST(create(String.class, "+"), create(String.class, "x"), create(String.class, "y"));
@@ -105,7 +106,7 @@ public class FunctionsTest {
     public void testCallToFunctionShouldEvaluateArguments() {
         Environment env = new Environment();
         Closure closure = (Closure) evaluate(parse("(lambda (a) (+ a 5))"), env);
-        AST ast = new AST(create(Closure.class, closure), create(parse("(if #f 0 (+ 10 10))")));
+        AST ast = new AST(create(Closure.class, closure), (parse("(if #f 0 (+ 10 10))")));
 
         assertEquals(25, evaluate(ast, env));
     }
@@ -137,14 +138,14 @@ public class FunctionsTest {
 
     @Test
     public void testCallingLambdaDirectly() {
-        AST ast = parse("((lambda (x) x) 42)");
+        Token ast = parse("((lambda (x) x) 42)");
         Object result = evaluate(ast, new Environment());
         assertEquals(42, result);
     }
 
     @Test
     public void testCallingComplexExpressionWhichEvaluatesToFunction() {
-        AST ast = parse(" ((if #f\n"
+        Token ast = parse(" ((if #f\n"
                 + "wont-evaluate-this-branch\n"
                 + "(lambda (x) (+ x y)))\n"
                 + "2)");
