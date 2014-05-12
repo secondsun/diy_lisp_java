@@ -35,13 +35,13 @@ public class ListTest {
     @Test
     public void testCreatingListWithCons() {
         Object result = evaluate(parse("(cons 0 '(1 2 3))"), new Environment());
-        assertEquals(parse("(0 1 2 3)"), result);
+        assertEquals(parse("(0 1 2 3)").tree, result);
     }
     
     @Test
     public void testCreatingLongerListWithOnlyCons() {
         Object result = evaluate(parse("(cons 3 (cons (- 4 2) (cons 1 '())))"), new Environment());
-        assertEquals(parse("(3 2 1)"), result);
+        assertEquals(parse("(3 2 1)").tree, result);
     }
     
 }
