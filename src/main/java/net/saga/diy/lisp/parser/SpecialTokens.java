@@ -31,6 +31,9 @@ public final class SpecialTokens {
     public static final AST.Token DEFINE = create(String.class, "define");
     public static final AST.Token LAMBDA = create(String.class, "lambda");
     public static final AST.Token CONS = create(String.class, "cons");
+    public static final AST.Token HEAD = create(String.class, "head");
+    public static final AST.Token TAIL = create(String.class, "tail");
+    public static final AST.Token EMPTY = create(String.class, "empty");
 
     public static final Set<AST.Token> MATHS = new HashSet<>(6);
     public static final Set<Token> ALL_TOKENS = new HashSet<Token>();
@@ -51,7 +54,12 @@ public final class SpecialTokens {
         ALL_TOKENS.add(DEFINE);
         ALL_TOKENS.add(LAMBDA);
         ALL_TOKENS.add(CONS);
+        ALL_TOKENS.add(HEAD);
+        ALL_TOKENS.add(TAIL);
+        ALL_TOKENS.add(EMPTY);
+        
         ALL_TOKENS.addAll(MATHS);
+        
 
     }
 

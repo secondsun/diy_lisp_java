@@ -25,12 +25,15 @@ import static net.saga.diy.lisp.parser.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.parser.operation.AtomOperation;
 import net.saga.diy.lisp.parser.operation.ConsOperation;
 import net.saga.diy.lisp.parser.operation.DefineOperation;
+import net.saga.diy.lisp.parser.operation.EmptyOperation;
 import net.saga.diy.lisp.parser.operation.EqOperation;
+import net.saga.diy.lisp.parser.operation.HeadOperation;
 import net.saga.diy.lisp.parser.operation.IfOperation;
 import net.saga.diy.lisp.parser.operation.LambdaOperation;
 import net.saga.diy.lisp.parser.operation.LookupOperation;
 import net.saga.diy.lisp.parser.operation.Operation;
 import net.saga.diy.lisp.parser.operation.QuoteOperation;
+import net.saga.diy.lisp.parser.operation.TailOperation;
 import net.saga.diy.lisp.parser.operation.math.MathOperation;
 import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
@@ -100,6 +103,12 @@ public class Evaluator {
                         operation = new DefineOperation();
                     } else if (SpecialTokens.CONS.equals(token)) {
                         operation = new ConsOperation();
+                    } else if (SpecialTokens.HEAD.equals(token)) {
+                        operation = new HeadOperation();
+                    } else if (SpecialTokens.TAIL.equals(token)) {
+                        operation = new TailOperation();
+                    }  else if (SpecialTokens.EMPTY.equals(token)) {
+                        operation = new EmptyOperation();
                     } else if (SpecialTokens.LAMBDA.equals(token)) {
                         operation = new LambdaOperation();
                     } else {
@@ -182,21 +191,7 @@ public class Evaluator {
             return;
         } else {
             if (token.type == String.class) {
-                if (QUOTE.equals(token)) {
-                    return;
-                } else if (SpecialTokens.ATOM.equals(token)) {
-                    return;
-                } else if (SpecialTokens.EQ.equals(token)) {
-                    return;
-                } else if (SpecialTokens.IF.equals(token)) {
-                    return;
-                } else if (SpecialTokens.MATHS.contains(token)) {
-                    return;
-                } else if (SpecialTokens.DEFINE.equals(token)) {
-                    return;
-                } else if (SpecialTokens.LAMBDA.equals(token)) {
-                    return;
-                } else if (SpecialTokens.CONS.equals(token)) {
+                if (SpecialTokens.ALL_TOKENS.contains(token)) {
                     return;
                 } else {
                     LookupOperation operation = new LookupOperation();
