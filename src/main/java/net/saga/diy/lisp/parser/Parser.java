@@ -22,7 +22,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.saga.diy.lisp.parser.AST.Token;
 import static net.saga.diy.lisp.parser.AST.Token.create;
-import static net.saga.diy.lisp.parser.AST.Token.create;
 import net.saga.diy.lisp.parser.types.LispException;
 
 public class Parser {

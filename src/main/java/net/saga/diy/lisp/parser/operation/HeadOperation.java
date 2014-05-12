@@ -16,7 +16,6 @@
 package net.saga.diy.lisp.parser.operation;
 
 import net.saga.diy.lisp.parser.AST;
-import net.saga.diy.lisp.parser.AST.Token;
 import static net.saga.diy.lisp.parser.Evaluator.evaluate;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
@@ -27,22 +26,22 @@ public class HeadOperation implements Operation<Object> {
     public Object operate(AST.Token listToken, Environment env) {
         if (listToken.tree == null) {
             throw new LispException(listToken + " is not a list");
-        } else if (listToken.tree.tokens.isEmpty() ) {
+        } else if (listToken.tree.tokens.isEmpty()) {
             throw new LispException(listToken + " is empty");
         }
-        
+
         Object result = evaluate(listToken.tree, env);
-        
+
         if (result instanceof AST) {
             AST ast = (AST) result;
-            if (ast.tokens.isEmpty() ) {
+            if (ast.tokens.isEmpty()) {
                 throw new LispException(listToken + " is empty");
             }
             return evaluate(ast.tokens.get(0), env);
         } else if (result.getClass().isArray()) {
-            return ((Object[])result)[0];
+            return ((Object[]) result)[0];
         }
-        
+
         throw new LispException(listToken + " is not a list");
     }
 }

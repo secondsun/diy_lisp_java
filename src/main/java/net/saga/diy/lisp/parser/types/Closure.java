@@ -16,7 +16,6 @@
 package net.saga.diy.lisp.parser.types;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.AST.Token;

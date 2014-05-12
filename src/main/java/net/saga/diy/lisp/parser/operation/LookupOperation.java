@@ -18,7 +18,6 @@ package net.saga.diy.lisp.parser.operation;
 
 import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.Evaluator;
-import net.saga.diy.lisp.parser.operation.Operation;
 import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
 

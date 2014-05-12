@@ -57,9 +57,8 @@ public final class SpecialTokens {
         ALL_TOKENS.add(HEAD);
         ALL_TOKENS.add(TAIL);
         ALL_TOKENS.add(EMPTY);
-        
+
         ALL_TOKENS.addAll(MATHS);
-        
 
     }
 

@@ -18,7 +18,6 @@ package net.saga.diy.lisp.parser;
 import java.util.Iterator;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertEquals;
 import static net.saga.diy.lisp.parser.AST.Token.create;
 import org.junit.Assert;
 import org.junit.Test;
