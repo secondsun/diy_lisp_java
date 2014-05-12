@@ -15,7 +15,6 @@
  */
 package net.saga.diy.lisp.parser;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -30,10 +29,7 @@ import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
 import static net.saga.diy.lisp.parser.types.Utils.isList;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 

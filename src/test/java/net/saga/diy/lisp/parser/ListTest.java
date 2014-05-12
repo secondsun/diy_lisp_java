@@ -21,7 +21,6 @@ import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class ListTest {

@@ -15,6 +15,8 @@
  */
 package net.saga.diy.lisp.parser;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -150,4 +152,36 @@ public class Parser {
         return pos;
     }
 
+    public static Object[] parseMultiple(Reader reader) {
+        char chara;
+        int parens = 0;
+        boolean expressionStarted = false;
+        List<Object> expressions = new ArrayList<>();
+        
+        StringBuilder builder = new StringBuilder();
+        try {
+            while ((chara = (char) reader.read()) != (char)-1) {
+                if (chara == '(') {
+                    parens++;
+                    expressionStarted = true;
+                } else if (chara == ')') {
+                    parens--;
+                }
+                
+                builder.append(chara);
+                
+                if (expressionStarted && parens == 0) {
+                    expressionStarted = false;
+                    expressions.add(parse(builder.toString()));
+                    builder = new StringBuilder();
+                }
+                
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        return expressions.toArray();
+    }
+    
 }
