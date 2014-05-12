@@ -1,17 +1,17 @@
 /**
  * Copyright Summers Pittman, and individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package net.saga.diy.lisp.parser;
 
@@ -132,7 +132,7 @@ public class ParserTest {
                 + "42 ; inline comment!\n"
                 + "(something else)))");
         Token expected = create(new AST());
-        
+
         expected.tree.tokens.add(create(String.class, "define"));
         expected.tree.tokens.add(create(String.class, "variable"));
         expected.tree.tokens.add(create(new AST()));
@@ -140,7 +140,7 @@ public class ParserTest {
         expected.tree.tokens.get(2).tree.tokens.add(create(Boolean.class, true));
         expected.tree.tokens.get(2).tree.tokens.add(create(Integer.class, 42));
         expected.tree.tokens.get(2).tree.tokens.add(create(new AST(create(String.class, "something"), create(String.class, "else"))));
-        
+
         assertEquals(root, expected);
 
     }
@@ -156,18 +156,17 @@ public class ParserTest {
                 + "; the existence of negative numbers\n"
                 + "(* n (fact (- n 1))))))");
 
-        Token expected
-                = (create(
-                                new AST(create(String.class, "define"), create(String.class, "fact"), create(
-                                                new AST(create(String.class, "lambda"), create(
-                                                                new AST(create(String.class, "n"))
-                                                        ), create(
-                                                                new AST(create(String.class, "if"), create(
-                                                                                new AST(create(String.class, "<="), create(String.class, "n"), create(Integer.class, 1))
-                                                                        ), create(Integer.class, 1), create(
-                                                                                new AST(create(String.class, "*"), create(String.class, "n"), create(new AST(create(String.class, "fact"), create(
-                                                                                                                new AST(create(String.class, "-"), create(String.class, "n"), create(Integer.class, 1))))))
-                                                                        )))))))
+        Token expected = (create(
+                new AST(create(String.class, "define"), create(String.class, "fact"), create(
+                        new AST(create(String.class, "lambda"), create(
+                                new AST(create(String.class, "n"))
+                                ), create(
+                                new AST(create(String.class, "if"), create(
+                                        new AST(create(String.class, "<="), create(String.class, "n"), create(Integer.class, 1))
+                                        ), create(Integer.class, 1), create(
+                                        new AST(create(String.class, "*"), create(String.class, "n"), create(new AST(create(String.class, "fact"), create(
+                                                new AST(create(String.class, "-"), create(String.class, "n"), create(Integer.class, 1))))))
+                                        )))))))
                 );
 
         Assert.assertEquals(expected, ast);
@@ -178,11 +177,10 @@ public class ParserTest {
     public void testQuotes() {
         Token ast = parse("(foo 'nil)");
 
-        Token expected
-                = (create(
-                        new AST(create(String.class, "foo"), create(
-                                        new AST(QUOTE, create(String.class, "nil"))
-                                ))
+        Token expected = (create(
+                new AST(create(String.class, "foo"), create(
+                        new AST(QUOTE, create(String.class, "nil"))
+                        ))
                 ));
 
         Assert.assertEquals(expected, ast);
@@ -194,11 +192,11 @@ public class ParserTest {
         Token ast = parse("''''foo");
         Token expected = (create(
                 new AST(QUOTE, create(
+                        new AST(QUOTE, create(
                                 new AST(QUOTE, create(
-                                                new AST(QUOTE, create(
-                                                                new AST(QUOTE, create(String.class, "foo"))
-                                                        ))
+                                        new AST(QUOTE, create(String.class, "foo"))
                                         ))
+                                ))
                         ))));
         Assert.assertEquals(expected, ast);
     }

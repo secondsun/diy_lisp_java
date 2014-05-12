@@ -34,7 +34,7 @@ public final class SpecialTokens {
 
     public static final Set<AST.Token> MATHS = new HashSet<>(6);
     public static final Set<Token> ALL_TOKENS = new HashSet<Token>();
-    
+
     static {
         MATHS.add(create(String.class, "+"));
         MATHS.add(create(String.class, "-"));
@@ -43,7 +43,7 @@ public final class SpecialTokens {
         MATHS.add(create(String.class, "mod"));
         MATHS.add(create(String.class, "<"));
         MATHS.add(create(String.class, ">"));
-        
+
         ALL_TOKENS.add(QUOTE);
         ALL_TOKENS.add(ATOM);
         ALL_TOKENS.add(EQ);
@@ -52,9 +52,7 @@ public final class SpecialTokens {
         ALL_TOKENS.add(LAMBDA);
         ALL_TOKENS.add(CONS);
         ALL_TOKENS.addAll(MATHS);
-        
+
     }
-    
-    
 
 }

@@ -45,7 +45,7 @@ public class EvaluatorTest {
     @Test
     public void evaluateQuote() {
         assertEquals("foo", run("( quote foo)"));
-        assertEquals(new AST(create(Integer.class, 1),  create(Integer.class, 2),create(Boolean.class, false)), run("(quote (1 2 #f))"));
+        assertEquals(new AST(create(Integer.class, 1), create(Integer.class, 2), create(Boolean.class, false)), run("(quote (1 2 #f))"));
     }
 
     @Test

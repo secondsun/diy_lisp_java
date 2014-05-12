@@ -1,17 +1,17 @@
 /**
  * Copyright Summers Pittman, and individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package net.saga.diy.lisp.parser;
 
@@ -42,8 +42,8 @@ public class Evaluator {
         if (token.tree != null) {
             validateTreeForEvaluation(token.tree, env);
             return evaluate(token.tree, env);
-        }else if (token.type == Boolean.class) {
-            return  (token.value);
+        } else if (token.type == Boolean.class) {
+            return (token.value);
         } else if (token.type == Integer.class) {
             return (token.value);
         } else if (token.type == String.class) {
@@ -51,9 +51,9 @@ public class Evaluator {
             if (value != null) {
                 return value;
             }
-            
+
         }
-        throw new LispException("Illegal token");            
+        throw new LispException("Illegal token");
     }
 
     public static Object evaluate(AST ast, Environment env) {
@@ -171,14 +171,14 @@ public class Evaluator {
     }
 
     /**
-     *
+     * 
      * Make sure the AST is a function call or a call to a special form.
-     *
+     * 
      * @param tree
      */
     private static void validateTreeForEvaluation(AST tree, Environment env) {
         Token token = tree.tokens.get(0);
-        if (token.tree != null) {//call to another list
+        if (token.tree != null) {// call to another list
             return;
         } else {
             if (token.type == String.class) {

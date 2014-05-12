@@ -1,17 +1,17 @@
 /**
  * Copyright Summers Pittman, and individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package net.saga.diy.lisp.parser;
 
@@ -98,30 +98,30 @@ public class Parser {
         StringBuilder expr = new StringBuilder();
         char[] arr;
         switch (next) {
-            case '\'':
-                buff.get();
-                expr.append("(quote ").append(nextExpression(buff)).append(")");
+        case '\'':
+            buff.get();
+            expr.append("(quote ").append(nextExpression(buff)).append(")");
 
-                break;
-            case '(':
-                int last = findMatchingParen(buff) + 1;
-                arr = new char[last];
-                buff.get(arr, 0, last);
-                expr.append(arr);
+            break;
+        case '(':
+            int last = findMatchingParen(buff) + 1;
+            arr = new char[last];
+            buff.get(arr, 0, last);
+            expr.append(arr);
 
-                break;
-            default:
-                String remaining = buff.toString();
-                Matcher match = PATTERN.matcher(remaining);
-                if (!match.lookingAt()) {
-                    throw new LispException("Illegal start of expression");
-                }
-                int end = match.end();
-                arr = new char[end];
-                buff.get(arr, 0, end);
-                expr.append(arr);
+            break;
+        default:
+            String remaining = buff.toString();
+            Matcher match = PATTERN.matcher(remaining);
+            if (!match.lookingAt()) {
+                throw new LispException("Illegal start of expression");
+            }
+            int end = match.end();
+            arr = new char[end];
+            buff.get(arr, 0, end);
+            expr.append(arr);
 
-                break;
+            break;
         }
 
         return expr.toString();

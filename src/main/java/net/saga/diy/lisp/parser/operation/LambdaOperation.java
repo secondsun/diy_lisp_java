@@ -1,11 +1,11 @@
-/*
- * Copyright 2014 summers.
+/**
+ * Copyright Summers Pittman, and individual contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.saga.diy.lisp.parser.operation;
 
 import java.util.ArrayList;
@@ -24,10 +23,10 @@ import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
 
 /**
- *
+ * 
  * @author summers
  */
-public class LambdaOperation implements Operation<Operation<Closure>>{
+public class LambdaOperation implements Operation<Operation<Closure>> {
 
     @Override
     public Operation<Closure> operate(AST.Token token, Environment env) {
@@ -47,5 +46,4 @@ public class LambdaOperation implements Operation<Operation<Closure>>{
         }
         return params;
     }
-    
 }

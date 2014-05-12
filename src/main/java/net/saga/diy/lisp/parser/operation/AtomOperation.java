@@ -30,18 +30,17 @@ public class AtomOperation implements Operation<Boolean> {
     }
 
     /*
-     * I made a mistake in how I parse "'" and it creates a new AST.  It makes 
+     * I made a mistake in how I parse "'" and it creates a new AST. It makes
      * some operations easier, but atoms now have to make sure a list isn't being
      * quoted.
-     * 
      */
     @Override
     public Boolean operate(AST.Token token, Environment env) {
         if (token.tree == null) {
             return true;
         }
-        return SpecialTokens.QUOTE.equals(token.tree.tokens.get(0)) && 
-               token.tree.tokens.size() == 2 && 
+        return SpecialTokens.QUOTE.equals(token.tree.tokens.get(0)) &&
+                token.tree.tokens.size() == 2 &&
                 token.tree.tokens.get(1).tree == null;
     }
 
