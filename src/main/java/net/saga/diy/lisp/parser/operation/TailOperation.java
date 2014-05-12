@@ -15,12 +15,7 @@
  */
 package net.saga.diy.lisp.parser.operation;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import net.saga.diy.lisp.parser.AST;
-import net.saga.diy.lisp.parser.AST.Token;
-import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.Evaluator.evaluate;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
@@ -29,32 +24,30 @@ import net.saga.diy.lisp.parser.types.LispException;
  * 
  * @author summers
  */
-public class TailOperation implements Operation<AST> {
+public class TailOperation implements Operation<Object[]> {
 
     @Override
-    public AST operate(AST.Token listToken, Environment env) {
-        if (listToken.tree == null) {
+    public Object[] operate(Object listToken, Environment env) {
+        
+        if (!listToken.getClass().isArray()) {
             throw new LispException(listToken + " is not a list");
-        } else if (listToken.tree.tokens.isEmpty() ) {
+        }
+        
+        Object[] listArr = (Object[]) listToken;
+        
+        if (listArr.length == 0) {
             throw new LispException(listToken + " is empty");
         }
         
-        Object result = evaluate(listToken.tree, env);
+        Object result = evaluate(listArr, env);
         
-        if (result instanceof AST) {
-            AST ast = (AST) result;
-            if (ast.tokens.isEmpty() ) {
-                throw new LispException(listToken + " is empty");
+        if (result.getClass().isArray()) {
+            Object[] ast = (Object[]) result;
+            if (ast.length == 0 ) {
+                throw new LispException(ast + " is empty");
             }
-            return new AST(ast.tokens.subList(1, ast.tokens.size()).toArray(new Token[ast.tokens.size() - 1]));
-        } else if (result.getClass().isArray()) {
-            Object[] resultArray = (Object[]) result;
-//            Token[] tokenArray = new Token[resultArray.length - 1];
-            List<Token> tokenList = new ArrayList<>(resultArray.length - 1);
-            Arrays.stream(resultArray, 1, resultArray.length).forEach((t) -> tokenList.add(create(t.getClass(), t)));
-            return new AST(tokenList.toArray(new Token[resultArray.length - 1]));
-            
-        }
-        throw new LispException(listToken + " is not a list");
+            return Arrays.copyOfRange(ast, 1, ast.length);
+        } 
+        throw new LispException(result + " is not a list");
     }
 }

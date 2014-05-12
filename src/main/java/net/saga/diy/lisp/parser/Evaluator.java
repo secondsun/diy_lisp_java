@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import net.saga.diy.lisp.parser.AST.Token;
-import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.parser.operation.AtomOperation;
 import net.saga.diy.lisp.parser.operation.ConsOperation;
@@ -38,19 +36,20 @@ import net.saga.diy.lisp.parser.operation.math.MathOperation;
 import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
+import static net.saga.diy.lisp.parser.types.Utils.isList;
 
 public class Evaluator {
 
-    public static Object evaluate(Token token, Environment env) {
-        if (token.tree != null) {
-            validateTreeForEvaluation(token.tree, env);
-            return evaluate(token.tree, env);
-        } else if (token.type == Boolean.class) {
-            return (token.value);
-        } else if (token.type == Integer.class) {
-            return (token.value);
-        } else if (token.type == String.class) {
-            Object value = env.lookup((String) token.value);
+    private static Object evaluateSingle(Object token, Environment env) {
+        if (token.getClass().isArray()) {
+            validateTreeForEvaluation((Object[])token, env);
+            return evaluate((Object[])token, env);
+        } else if (token.getClass() == Boolean.class) {
+            return (token);
+        } else if (token.getClass() == Integer.class) {
+            return (token);
+        } else if (token.getClass() == String.class) {
+            Object value = env.lookup((String) token);
             if (value != null) {
                 return value;
             }
@@ -59,15 +58,19 @@ public class Evaluator {
         throw new LispException("Illegal token");
     }
 
-    public static Object evaluate(AST ast, Environment env) {
+    public static Object evaluate(Object input, Environment env) {
+        if (!isList(input)) {
+            return evaluateSingle(input, env);
+        }
+        Object[]ast = (Object[]) input;
+        validateTreeForEvaluation(ast, env);
         ArrayList value = new ArrayList();
         Operation operation = null;
-        Iterator<AST.Token> tokensItem = ast.tokens.iterator();
-        while (tokensItem.hasNext()) {
-            AST.Token token = tokensItem.next();
-            if (token.tree != null) {
-                validateTreeForEvaluation(token.tree, env);
-                Object res = evaluate(token.tree, env);
+        int length = ast.length;
+        for (int pointer = 0; pointer < length; pointer++) {
+            Object token = ast[pointer];
+            if (token.getClass().isArray()) {
+                Object res = evaluate((Object[])token, env);
                 if (res.getClass().isArray()) {
                     Object[] arrayRes = (Object[]) res;
                     for (Object arrayObject : arrayRes) {
@@ -84,7 +87,7 @@ public class Evaluator {
                     }
                 }
             } else {
-                if (token.type == String.class) {
+                if (token.getClass() == String.class) {
                     if (QUOTE.equals(token)) {
                         operation = new QuoteOperation();
 
@@ -123,34 +126,39 @@ public class Evaluator {
 
                     }
 
-                    Object res = operation.operate(tokensItem.next(), env);
+                    Object res = operation.operate(ast[++pointer], env);
 
                     while (res instanceof Operation) {
-                        if (!tokensItem.hasNext()) {
+                        if ((pointer + 1) >= ast.length) {
                             throw new LispException("Missing token");
                         }
-                        res = ((Operation) res).operate(tokensItem.next(), env);
+                        res = ((Operation) res).operate(ast[++pointer], env);
                     }
                     if (res == null) {
                         value.add(Void.TYPE);
-                    } else if (res.getClass().isArray()) {
-                        value.addAll(Arrays.asList((Object[]) res));
                     } else {
                         value.add(res);
                     }
 
+                    if ((pointer + 1) != ast.length)  {
+                        throw new LispException("Expected end of expression at " + ast[pointer]);
+                    }
+                    
                     operation = null;
 
-                } else if (token.type == Boolean.class) {
-                    value.add(token.value);
-                } else if (token.type == Integer.class) {
-                    value.add(token.value);
-                } else if (token.type == Closure.class) {
+                } else if (token.getClass() == Boolean.class) {
+                    value.add(token);
+                } else if (token.getClass() == Integer.class) {
+                    value.add(token);
+                } else if (token.getClass() == Closure.class) {
 
-                    Closure closure = (Closure) token.value;
+                    Closure closure = (Closure) token;
                     Environment envClosure = new Environment(closure.getEnv());
-                    List<String> vars = closure.getParams();
-                    vars.forEach(var -> envClosure.set(var, evaluate(new AST(tokensItem.next()), env)));
+                    Object[] vars = closure.getParams();
+                    for (Object var : vars) {
+                        envClosure.set((String) var, evaluate((Object)ast[++pointer], env));
+                    }
+                    
                     value.add(evaluate((closure).getBody(), envClosure));
                 }
             }
@@ -159,22 +167,23 @@ public class Evaluator {
         if (value.size() == 1) {
             return value.get(0);
         }
+        
         if (value.isEmpty()) {
             return Void.class;
         } else {
 
             Object[] valueArray = value.toArray();
             if (valueArray[0] instanceof Closure) {
-                List<Token> closureTokens = new ArrayList<>(valueArray.length);
+                List<Object> closureTokens = new ArrayList<>(valueArray.length);
                 for (Object obj : valueArray) {
-                    closureTokens.add(create(obj.getClass(), obj));
+                    closureTokens.add(obj);
                 }
 
-                return evaluate(new AST(closureTokens.toArray(new Token[0])), env);
+                return evaluate(closureTokens.toArray(), env);
 
             } else {
-                throw new LispException("Illegal tokens");
-                //return valueArray;
+                //throw new LispException("Illegal tokens " + valueArray[0]);
+                return valueArray;
             }
         }
     }
@@ -185,30 +194,30 @@ public class Evaluator {
      * 
      * @param tree
      */
-    private static void validateTreeForEvaluation(AST tree, Environment env) {
-        Token token = tree.tokens.get(0);
-        if (token.tree != null) {// call to another list
+    private static void validateTreeForEvaluation(Object[] tree, Environment env) {
+        Object token = tree[0];
+        if (token.getClass().isArray()) {// call to another list
             return;
         } else {
-            if (token.type == String.class) {
+            if (token.getClass() == String.class) {
                 if (SpecialTokens.ALL_TOKENS.contains(token)) {
                     return;
                 } else {
                     LookupOperation operation = new LookupOperation();
                     Object result = operation.operate(token, env);
                     if (!(result instanceof Operation)) {
-                        throw new LispException("List is not a function call");
+                        throw new LispException("List is not a function call:" + result + " from " + tree);
                     } else {
                         return;
                     }
 
                 }
 
-            } else if (token.type == Boolean.class) {
-                throw new LispException("List is not a function call");
-            } else if (token.type == Integer.class) {
-                throw new LispException("List is not a function call");
-            } else if (token.type == Closure.class) {
+            } else if (token  instanceof Boolean) {
+                throw new LispException("List is not a function call: " + tree);
+            } else if (token  instanceof Integer) {
+                throw new LispException("List is not a function call: " + tree);
+            } else if (token instanceof Closure) {
                 return;
             }
         }

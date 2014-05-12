@@ -18,18 +18,22 @@ package net.saga.diy.lisp.parser;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.saga.diy.lisp.parser.AST.Token;
-import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.Evaluator.evaluate;
 import static net.saga.diy.lisp.parser.Parser.parse;
 import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
+import static net.saga.diy.lisp.parser.types.Utils.isList;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -37,7 +41,7 @@ public class FunctionsTest {
 
     @Test
     public void testLambdaEvaluateToLambda() {
-        Token ast = parse("(lambda () 42)");
+        Object ast = (Object[])parse("(lambda () 42)");
         Closure closure = (Closure) evaluate(ast, new Environment());
         assertTrue(closure instanceof Closure);
     }
@@ -46,58 +50,58 @@ public class FunctionsTest {
     public void testLambdaKeepsDefiningEnv() {
 
         Environment env = new Environment(map(entry("foo", 1), entry("bar", 2)));
-        Token ast = parse("(lambda () 42)");
+        Object ast = (Object[])parse("(lambda () 42)");
         Closure closure = (Closure) evaluate(ast, env);
         assertEquals(env, closure.getEnv());
     }
 
     @Test
     public void testLambdaClosureHoldsFunction() {
-        Token ast = parse("(lambda (x y) (+ x y))");
+        Object ast = (Object[])parse("(lambda (x y) (+ x y))");
         Closure closure = (Closure) evaluate(ast, new Environment());
 
-        AST expected = new AST(create(String.class, "+"), create(String.class, "x"), create(String.class, "y"));
+        Object[] expected = new Object[] {"+", "x", "y"};
 
-        assertEquals(Lists.newArrayList("x", "y"), closure.getParams());
-        assertEquals(expected, closure.getBody());
+        assertArrayEquals(new Object[]{"x", "y"}, closure.getParams());
+        assertArrayEquals(expected, (Object[])closure.getBody());
 
     }
 
     @Test
     public void testLambdaArgumentsAreList() {
 
-        Closure closure = (Closure) evaluate(parse("(lambda (x y) (+ x y))"), new Environment());
+        Closure closure = (Closure) evaluate((Object[])parse("(lambda (x y) (+ x y))"), new Environment());
 
-        assertTrue(closure.getParams() instanceof List);
+        assertTrue(isList(closure.getParams()));
     }
 
     @Test(expected = LispException.class)
     public void testLambdaFails() {
-        evaluate(parse("(lambda not-a-list (body of fn))"), new Environment());
+        evaluate((Object[])parse("(lambda not-a-list (body of fn))"), new Environment());
     }
 
     @Test(expected = LispException.class)
     public void testLambdaNumbeOfArguments() {
-        evaluate(parse("(lambda (foo) (bar) (baz))"), new Environment());
+        evaluate((Object[])parse("(lambda (foo) (bar) (baz))"), new Environment());
     }
 
     @Test
     public void testBodyIsNotEvaluated() {
-        evaluate(parse("(lambda (foo) (function body ((that) would never) work))"), new Environment());
+        evaluate((Object[])parse("(lambda (foo) (function body ((that) would never) work))"), new Environment());
     }
 
     @Test
     public void testCallToClosure() {
-        Closure closure = (Closure) evaluate(parse("(lambda () (+ 1 2))"), new Environment());
-        AST ast = new AST(create(Closure.class, closure));
+        Closure closure = (Closure) evaluate((Object[])parse("(lambda () (+ 1 2))"), new Environment());
+        Object[] ast = new Object[]{closure};
         assertEquals(3, evaluate(ast, new Environment()));
     }
 
     @Test
     public void testCallWithVariables() {
         Environment env = new Environment();
-        Closure closure = (Closure) evaluate(parse("(lambda (a b) (+ a b))"), env);
-        AST ast = new AST(create(Closure.class, closure), create(Integer.class, 4), create(Integer.class, 5));
+        Closure closure = (Closure) evaluate((Object[])parse("(lambda (a b) (+ a b))"), env);
+        Object[] ast = new Object[]{closure, 4, 5};
 
         assertEquals(9, evaluate(ast, env));
     }
@@ -105,18 +109,20 @@ public class FunctionsTest {
     @Test
     public void testCallToFunctionShouldEvaluateArguments() {
         Environment env = new Environment();
-        Closure closure = (Closure) evaluate(parse("(lambda (a) (+ a 5))"), env);
-        AST ast = new AST(create(Closure.class, closure), (parse("(if #f 0 (+ 10 10))")));
-
-        assertEquals(25, evaluate(ast, env));
+        Closure closure = (Closure) evaluate((Object[])parse("(lambda (a) (+ a 5))"), env);
+        
+        List<Object> list = new ArrayList(2);
+        list.add(closure);
+        list.add(parse("(if #f 0 (+ 10 10))"));
+        assertEquals(25, evaluate(list.toArray(), env));
     }
 
     @Test
     public void testCallToFunctionWithFreeVariables() {
         Environment env = new Environment();
         env.set("y", 1);
-        Closure closure = (Closure) evaluate(parse("(lambda (x) (+ x y))"), env);
-        AST ast = new AST(create(Closure.class, closure), create(Integer.class, 0));
+        Closure closure = (Closure) evaluate((Object[])parse("(lambda (x) (+ x y))"), env);
+        Object[] ast = new Object[]{closure, 0};
 
         env = new Environment();
         env.set("y", 2);
@@ -130,22 +136,22 @@ public class FunctionsTest {
         Environment env = new Environment();
         env.set("y", 1);
 
-        evaluate(parse("(define add (lambda (x y) (+ x y)))"), env);
+        evaluate((Object[])parse("(define add (lambda (x y) (+ x y)))"), env);
 
         assertTrue(env.lookup("add") instanceof Closure);
-        assertEquals(3, evaluate(parse("(add 1 2)"), env));
+        assertEquals(3, evaluate((Object[])parse("(add 1 2)"), env));
     }
 
     @Test
     public void testCallingLambdaDirectly() {
-        Token ast = parse("((lambda (x) x) 42)");
+        Object[] ast = (Object[]) (Object[])parse("((lambda (x) x) 42)");
         Object result = evaluate(ast, new Environment());
         assertEquals(42, result);
     }
 
     @Test
     public void testCallingComplexExpressionWhichEvaluatesToFunction() {
-        Token ast = parse(" ((if #f\n"
+        Object[] ast = (Object[]) (Object[])parse(" ((if #f\n"
                 + "wont-evaluate-this-branch\n"
                 + "(lambda (x) (+ x y)))\n"
                 + "2)");
@@ -157,41 +163,41 @@ public class FunctionsTest {
 
     @Test(expected = LispException.class)
     public void testCallingAtomRaisesException1() {
-        evaluate(parse("(#t 'foo 'bar)"), new Environment());
+        evaluate((Object[])parse("(#t 'foo 'bar)"), new Environment());
     }
 
     @Test(expected = LispException.class)
     public void testCallingAtomRaisesException2() {
-        evaluate(parse("(42)"), new Environment());
+        evaluate((Object[])parse("(42)"), new Environment());
     }
 
     @Test
     public void testArgumentsAreEvaluated() {
-        assertEquals(3, evaluate(parse("((lambda (x) x) (+ 1 2))"), new Environment()));
+        assertEquals(3, evaluate((Object[])parse("((lambda (x) x) (+ 1 2))"), new Environment()));
     }
 
     @Test(expected = LispException.class)
     public void testCallingWithWrongNumberOfArguments() {
         Environment env = new Environment();
 
-        evaluate(parse("(define fn (lambda (p1 p2) 'whatwever))"), env);
+        evaluate((Object[])parse("(define fn (lambda (p1 p2) 'whatwever))"), env);
 
-        evaluate(parse("(fn 1 2 3)"), env);
+        evaluate((Object[])parse("(fn 1 2 3)"), env);
     }
 
     @Test
     public void testRecursion() {
         Environment env = new Environment();
 
-        evaluate(parse(" (define my-fn\n"
+        evaluate((Object[])parse(" (define my-fn\n"
                 + ";; A meaningless, but recursive, function\n"
                 + "(lambda (x)\n"
                 + "(if (eq x 0)\n"
                 + "42\n"
                 + "(my-fn (- x 1)))))"), env);
 
-        assertEquals(42, evaluate(parse("(my-fn 0)"), env));
-        assertEquals(42, evaluate(parse("(my-fn 10)"), env));
+        assertEquals(42, evaluate((Object[])parse("(my-fn 0)"), env));
+        assertEquals(42, evaluate((Object[])parse("(my-fn 10)"), env));
     }
 
     private <K, V> Map.Entry<K, V> entry(K key, V value) {

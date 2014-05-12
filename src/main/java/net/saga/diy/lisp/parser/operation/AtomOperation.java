@@ -16,7 +16,6 @@
 
 package net.saga.diy.lisp.parser.operation;
 
-import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.SpecialTokens;
 import net.saga.diy.lisp.parser.types.Environment;
 
@@ -35,13 +34,16 @@ public class AtomOperation implements Operation<Boolean> {
      * quoted.
      */
     @Override
-    public Boolean operate(AST.Token token, Environment env) {
-        if (token.tree == null) {
+    public Boolean operate(Object token, Environment env) {
+        if (!token.getClass().isArray()) {
             return true;
         }
-        return SpecialTokens.QUOTE.equals(token.tree.tokens.get(0)) &&
-                token.tree.tokens.size() == 2 &&
-                token.tree.tokens.get(1).tree == null;
+        
+        Object[] tokenArr = (Object[]) token;
+        
+        return SpecialTokens.QUOTE.equals(tokenArr[0]) &&
+                tokenArr.length == 2 &&
+                !tokenArr[1].getClass().isArray();
     }
 
 }

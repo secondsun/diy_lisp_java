@@ -16,41 +16,34 @@
 package net.saga.diy.lisp.parser.types;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import net.saga.diy.lisp.parser.AST;
-import net.saga.diy.lisp.parser.AST.Token;
-import static net.saga.diy.lisp.parser.AST.Token.create;
 
 public class Closure {
 
-    private final List<String> params = new ArrayList<String>();
+    private final List<Object> params;
     private final Environment env;
-    private final AST body;
+    private final Object body;
 
-    public Closure(Environment env, Token params, Token body) {
+    public Closure(Environment env, Object[] params, Object body) {
         this.env = env;
 
-        if (params.tree == null) {
-            throw new LispException("params not a list");
-        }
-
-        params.tree.tokens.forEach((varToken) -> this.params.add((String) varToken.value));
-        if (body.tree == null) {
-            this.body = new AST(create(body.type, body.value));
-        } else {
-            this.body = body.tree;
-        }
+        this.params = Arrays.asList(params);
+        
+        
+        this.body = body;
+        
     }
 
     public Environment getEnv() {
         return env;
     }
 
-    public List<String> getParams() {
-        return new ArrayList<>(params);
+    public Object[] getParams() {
+        return new ArrayList<>(params).toArray();
     }
 
-    public AST getBody() {
+    public Object getBody() {
         return body;
     }
 

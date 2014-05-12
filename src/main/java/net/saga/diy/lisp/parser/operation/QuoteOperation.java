@@ -16,7 +16,6 @@
 
 package net.saga.diy.lisp.parser.operation;
 
-import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.types.Environment;
 
 /**
@@ -26,11 +25,11 @@ import net.saga.diy.lisp.parser.types.Environment;
 public class QuoteOperation implements Operation<Object> {
 
     @Override
-    public Object operate(AST.Token token, Environment env) {
-        if (token.type == String.class) {
-            return (String) token.value;
+    public Object operate(Object token, Environment env) {
+        if (token instanceof String) {
+            return token;
         } else {
-            return token.tree;
+            return (Object[]) token;
         }
     }
 

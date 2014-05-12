@@ -15,11 +15,12 @@
  */
 package net.saga.diy.lisp.parser;
 
-import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.Evaluator.evaluate;
 import static net.saga.diy.lisp.parser.Parser.parse;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -27,21 +28,20 @@ public class ListTest {
 
     @Test
     public void testCreatingListsByQuoting() {
-        assertEquals(new AST(create(Integer.class, 1), create(Integer.class, 2),
-                create(Integer.class, 3), create(Boolean.class, true)),
-                evaluate(parse("'(1 2 3 #t)"), new Environment()));
+        assertArrayEquals(new Object[]{1,2,3, true},
+                (Object[])evaluate(parse("'(1 2 3 #t)"), new Environment()));
     }
 
     @Test
     public void testCreatingListWithCons() {
-        Object result = evaluate(parse("(cons 0 '(1 2 3))"), new Environment());
-        assertEquals(parse("(0 1 2 3)").tree, result);
+        Object[] result = (Object[]) evaluate(parse("(cons 0 '(1 2 3))"), new Environment());
+        assertArrayEquals((Object[])parse("(0 1 2 3)"), result);
     }
 
     @Test
     public void testCreatingLongerListWithOnlyCons() {
-        Object result = evaluate(parse("(cons 3 (cons (- 4 2) (cons 1 '())))"), new Environment());
-        assertEquals(parse("(3 2 1)").tree, result);
+        Object[] result = (Object[]) evaluate(parse("(cons 3 (cons (- 4 2) (cons 1 '())))"), new Environment());
+        assertArrayEquals((Object[])parse("(3 2 1)"), result);
     }
 
     @Test
@@ -56,8 +56,8 @@ public class ListTest {
 
     @Test
     public void testGetTail() {
-        AST expected = new AST(create(Integer.class, 2), create(Integer.class, 3));
-        assertEquals(expected, evaluate(parse("(tail '(1 2 3))"), new Environment()));
+        Object[] expected = new Object[]{2, 3};
+        assertArrayEquals(expected, (Object[])evaluate(parse("(tail '(1 2 3))"), new Environment()));
     }
 
     @Test

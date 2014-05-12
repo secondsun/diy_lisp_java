@@ -15,7 +15,6 @@
  */
 package net.saga.diy.lisp.parser.operation.math;
 
-import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.Evaluator;
 import net.saga.diy.lisp.parser.operation.Operation;
 import net.saga.diy.lisp.parser.types.Environment;
@@ -25,12 +24,12 @@ public class MathOperation implements Operation<Operation> {
 
     private final Operand op;
 
-    public MathOperation(AST.Token token) {
-        op = Operand.fromSymbol((String) token.value);
+    public MathOperation(Object token) {
+        op = Operand.fromSymbol((String) token);
     }
 
     @Override
-    public Operation operate(final AST.Token token, Environment env) {
+    public Operation operate(final Object token, Environment env) {
 
         final int value = verifyAndEvaluate(token, env);
         
@@ -67,18 +66,18 @@ public class MathOperation implements Operation<Operation> {
         }
     };
 
-    private Integer verifyAndEvaluate(AST.Token token, Environment env) {
+    private Integer verifyAndEvaluate(Object token, Environment env) {
 
-        if (token.type == Integer.class) {
-            return (Integer) token.value;
+        if (token instanceof Integer) {
+            return (Integer) token;
         }
 
-        if (token.type == String.class) {
-            return (Integer) env.lookup((String) token.value);
+        if (token instanceof String) {
+            return (Integer) env.lookup((String) token);
         }
 
-        if (token.tree != null) {
-            Object result = Evaluator.evaluate(token.tree, env);
+        if (token.getClass().isArray()) {
+            Object result = Evaluator.evaluate((Object[])token, env);
             if (result instanceof Integer) {
                 return (Integer) result;
             }

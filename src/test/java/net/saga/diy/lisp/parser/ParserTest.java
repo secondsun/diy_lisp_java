@@ -1,98 +1,96 @@
 /**
  * Copyright Summers Pittman, and individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package net.saga.diy.lisp.parser;
 
 import java.util.Iterator;
-import net.saga.diy.lisp.parser.AST.Token;
-import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.Parser.parse;
 import static net.saga.diy.lisp.parser.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.parser.types.LispException;
+import static net.saga.diy.lisp.parser.types.Utils.isList;
 import org.junit.Assert;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class ParserTest {
 
     @Test
     public void testSingleToken() {
-        Token token = Parser.parse("foo");
-        Assert.assertEquals(create(String.class, "foo"), token);
+        Object token = Parser.parse("foo");
+        assertEquals("foo", token);
     }
 
     @Test
     public void testSingleNUmber() {
-        Token token = parse("42");
-        Assert.assertEquals(create(Integer.class, 42), token);
+        Object token = parse("42");
+        assertEquals(42, token);
 
         token = Parser.parse("1337");
-        Assert.assertEquals(create(Integer.class, 1337), token);
+        assertEquals(1337, token);
 
     }
 
     @Test
     public void testParseBoolean() {
-        Token token = Parser.parse("#t");
-        Assert.assertEquals(create(Boolean.class, true), token);
+        Object token = Parser.parse("#t");
+        Assert.assertEquals(true, token);
 
         token = Parser.parse("#f");
-        Assert.assertEquals(create(Boolean.class, false), token);
+        Assert.assertEquals(false, token);
     }
 
     @Test
     public void testParseListOfSymbols() {
-        Token token = Parser.parse("(foo bar baz)");
+        Object[] token = (Object[]) Parser.parse("(foo bar baz)");
 
-        Iterator<AST.Token> iter = token.tree.iterator();
-
-        Assert.assertEquals(create(String.class, "foo"), iter.next());
-        Assert.assertEquals(create(String.class, "bar"), iter.next());
-        Assert.assertEquals(create(String.class, "baz"), iter.next());
+        assertArrayEquals(new String[]{"foo", "bar", "baz"}, token);
 
     }
 
     @Test
     public void testParseListOfMixedTypes() {
-        Token token = parse("(foo #t 123)");
-
-        Iterator<AST.Token> iter = token.tree.iterator();
-
-        Assert.assertEquals(create(String.class, "foo"), iter.next());
-        Assert.assertEquals(create(Boolean.class, true), iter.next());
-        Assert.assertEquals(create(Integer.class, 123), iter.next());
+        Object[] token = (Object[]) parse("(foo #t 123)");
+        assertArrayEquals(new Object[]{"foo", true, 123}, token);
 
     }
 
     @Test
     public void testParseOfNestedList() {
-        Token token = Parser.parse("(foo (bar ((#t)) x) (baz y))");
+        Object[] token = (Object[]) Parser.parse("(foo (bar ((#t)) x) (baz y))");
 
-        Iterator<AST.Token> iter = token.tree.iterator();
+        assertTrue(isList(token[1]));
+        assertTrue(isList(((Object[]) ((Object[]) token[1])[1])[0]));
+        assertTrue(isList(token[2]));
 
-        Assert.assertTrue(token.tree.tokens.get(1).tree != null);
-        Assert.assertTrue(token.tree.tokens.get(1).tree.tokens.get(1).tree.tokens.get(0).tree != null);
-        Assert.assertTrue(token.tree.tokens.get(2).tree != null);
-
-        Assert.assertEquals(create(String.class, "foo"), iter.next());
-        Assert.assertEquals(create(String.class, "bar"), iter.next());
-        Assert.assertEquals(create(Boolean.class, true), iter.next());
-        Assert.assertEquals(create(String.class, "x"), iter.next());
-        Assert.assertEquals(create(String.class, "baz"), iter.next());
-        Assert.assertEquals(create(String.class, "y"), iter.next());
+        assertEquals("foo", token[0]);
+        assertEquals("bar", ((Object[]) token[1])[0]);
+        assertEquals(true, ((Object[]) ((Object[]) ((Object[]) token[1])[1])[0])[0]);
+//        assertEquals("x", iter.next());
+//        assertEquals("baz", iter.next());
+//        assertEquals("y", iter.next());
 
     }
 
@@ -108,44 +106,44 @@ public class ParserTest {
 
     @Test
     public void parseExtraWhitespace() {
-        Token tree = parse("                             \n"
+        Object[] tree = (Object[]) parse("                             \n"
                 + "                                 \n"
                 + "(program    with   much        whitespace)\n"
                 + "               ");
 
-        assertNotNull(tree.tree);
+        assertTrue(isList(tree));
 
-        assertEquals(tree.tree.tokens.get(0), create(String.class, "program"));
-        assertEquals(tree.tree.tokens.get(1), create(String.class, "with"));
-        assertEquals(tree.tree.tokens.get(2), create(String.class, "much"));
-        assertEquals(tree.tree.tokens.get(3), create(String.class, "whitespace"));
+        assertEquals(tree[0], "program");
+        assertEquals(tree[1], "with");
+        assertEquals(tree[2], "much");
+        assertEquals(tree[3], "whitespace");
     }
 
     @Test
     public void parseComments() {
-        Token root = parse(" ;; this first line is a comment\n"
+        Object[] root = (Object[]) parse(" ;; this first line is a comment\n"
                 + "(define variable\n"
                 + "; here is another comment\n"
                 + "(if #t\n"
                 + "42 ; inline comment!\n"
                 + "(something else)))");
-        Token expected = create(new AST());
+        Object[] expected = new Object[3];
 
-        expected.tree.tokens.add(create(String.class, "define"));
-        expected.tree.tokens.add(create(String.class, "variable"));
-        expected.tree.tokens.add(create(new AST()));
-        expected.tree.tokens.get(2).tree.tokens.add(create(String.class, "if"));
-        expected.tree.tokens.get(2).tree.tokens.add(create(Boolean.class, true));
-        expected.tree.tokens.get(2).tree.tokens.add(create(Integer.class, 42));
-        expected.tree.tokens.get(2).tree.tokens.add(create(new AST(create(String.class, "something"), create(String.class, "else"))));
+        expected[0] = ("define");
+        expected[1] = ("variable");
+        expected[2] = (new Object[4]);
+        ((Object[]) expected[2])[0] = "if";
+        ((Object[]) expected[2])[1] = (true);
+        ((Object[]) expected[2])[2] = (42);
+        ((Object[]) expected[2])[3] = (new Object[]{"something", "else"});
 
-        assertEquals(root, expected);
+        assertArrayEquals(expected, root);
 
     }
 
     @Test
     public void testLargeFile() {
-        Token ast = parse(" "
+        Object[] ast = (Object[]) parse(" "
                 + "(define fact\n"
                 + ";; Factorial function\n"
                 + "(lambda (n)\n"
@@ -154,49 +152,30 @@ public class ParserTest {
                 + "; the existence of negative numbers\n"
                 + "(* n (fact (- n 1))))))");
 
-        Token expected = (create(
-                new AST(create(String.class, "define"), create(String.class, "fact"), create(
-                        new AST(create(String.class, "lambda"), create(
-                                new AST(create(String.class, "n"))
-                                ), create(
-                                new AST(create(String.class, "if"), create(
-                                        new AST(create(String.class, "<="), create(String.class, "n"), create(Integer.class, 1))
-                                        ), create(Integer.class, 1), create(
-                                        new AST(create(String.class, "*"), create(String.class, "n"), create(new AST(create(String.class, "fact"), create(
-                                                new AST(create(String.class, "-"), create(String.class, "n"), create(Integer.class, 1))))))
-                                        )))))))
-                );
+        Object[] expected = new Object[]{"define", "fact", new Object[]{
+            "lambda", new Object[]{"n"}, new Object[]{"if", new Object[]{"<=", "n", 1}, 1, new Object[]{"*", "n", new Object[]{"fact", new Object[]{"-", "n", 1}}}}}};
 
-        Assert.assertEquals(expected, ast);
+        assertArrayEquals(expected, ast);
 
     }
 
     @Test
     public void testQuotes() {
-        Token ast = parse("(foo 'nil)");
+        Object[] ast = (Object[]) parse("(foo 'nil)");
 
-        Token expected = (create(
-                new AST(create(String.class, "foo"), create(
-                        new AST(QUOTE, create(String.class, "nil"))
-                        ))
-                ));
+        Object expected = new Object[] { "foo", new Object[] { "quote","nil"}};
+        
 
-        Assert.assertEquals(expected, ast);
+        Assert.assertArrayEquals((Object[])expected, ast);
 
     }
 
     @Test
     public void testNestedQuotes() {
-        Token ast = parse("''''foo");
-        Token expected = (create(
-                new AST(QUOTE, create(
-                        new AST(QUOTE, create(
-                                new AST(QUOTE, create(
-                                        new AST(QUOTE, create(String.class, "foo"))
-                                        ))
-                                ))
-                        ))));
-        Assert.assertEquals(expected, ast);
+        Object[] ast = (Object[]) parse("''''foo");
+        Object[] expected = new Object[] { "quote", new Object[] { "quote", new Object[] { "quote", new Object[] { "quote", "foo"}}}};
+        
+        Assert.assertArrayEquals(expected, ast);
     }
 
 }

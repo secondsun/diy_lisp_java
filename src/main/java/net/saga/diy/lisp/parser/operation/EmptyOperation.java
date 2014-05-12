@@ -15,26 +15,23 @@
  */
 package net.saga.diy.lisp.parser.operation;
 
-import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.Evaluator;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
+import net.saga.diy.lisp.parser.types.Utils;
+import static net.saga.diy.lisp.parser.types.Utils.isList;
 
 public class EmptyOperation implements Operation<Boolean> {
 
     @Override
-    public Boolean operate(AST.Token listToken, Environment firstEnv) {
-        if (listToken.tree == null) {
+    public Boolean operate(Object listToken, Environment firstEnv) {
+        if (!isList(listToken)) {
             throw new LispException(listToken + " is not a list");
         }
-        Object res = Evaluator.evaluate(listToken.tree, firstEnv);
-        if (res instanceof AST) {
-            return ((AST) res).tokens.isEmpty();
-        } else if (res instanceof Object[]) {
-            return ((Object[]) res).length == 0;
-        }
-
-        throw new LispException(listToken + " is not a list");
+        Object res = Evaluator.evaluate((Object[])listToken, firstEnv);
+        
+        return Utils.isEmptyList(res);
+        
     }
 
 }

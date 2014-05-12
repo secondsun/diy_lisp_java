@@ -17,8 +17,6 @@ package net.saga.diy.lisp.parser.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.saga.diy.lisp.parser.AST;
-import net.saga.diy.lisp.parser.AST.Token;
 import net.saga.diy.lisp.parser.Evaluator;
 import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
@@ -26,21 +24,21 @@ import net.saga.diy.lisp.parser.types.Environment;
 public class ClosureOperation implements Operation<Object> {
 
     private final Closure closure;
-    private final List<AST.Token> tokens = new ArrayList<AST.Token>();
+    private final List<Object> tokens = new ArrayList<Object>();
 
     public ClosureOperation(Closure closure) {
         this.closure = closure;
     }
 
     @Override
-    public Object operate(AST.Token token, Environment env) {
+    public Object operate(Object token, Environment env) {
         tokens.add(token);
-        if (tokens.size() == closure.getParams().size()) {
+        if (tokens.size() == closure.getParams().length) {
             Environment closureEnvironment = closure.getEnv();
             for (int i = 0; i < tokens.size(); i++) {
-                String varname = closure.getParams().get(i);
-                Token variableToken = tokens.get(i);
-                Object tokenValue = Evaluator.evaluate(new AST(variableToken), env);
+                String varname = (String) closure.getParams()[i];
+                Object variableToken = tokens.get(i);
+                Object tokenValue = Evaluator.evaluate(variableToken, env);
                 closureEnvironment = closureEnvironment.extend(varname, tokenValue);
 
             }

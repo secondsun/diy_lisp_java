@@ -17,35 +17,33 @@ package net.saga.diy.lisp.parser;
 
 import java.util.HashSet;
 import java.util.Set;
-import net.saga.diy.lisp.parser.AST.Token;
-import static net.saga.diy.lisp.parser.AST.Token.create;
 
 public final class SpecialTokens {
     private SpecialTokens() {
     }
 
-    public static final AST.Token QUOTE = create(String.class, "quote");
-    public static final AST.Token ATOM = create(String.class, "atom");
-    public static final AST.Token EQ = create(String.class, "eq");
-    public static final AST.Token IF = create(String.class, "if");
-    public static final AST.Token DEFINE = create(String.class, "define");
-    public static final AST.Token LAMBDA = create(String.class, "lambda");
-    public static final AST.Token CONS = create(String.class, "cons");
-    public static final AST.Token HEAD = create(String.class, "head");
-    public static final AST.Token TAIL = create(String.class, "tail");
-    public static final AST.Token EMPTY = create(String.class, "empty");
+    public static final String QUOTE = "quote";
+    public static final String ATOM = "atom";
+    public static final String EQ = "eq";
+    public static final String IF = "if";
+    public static final String DEFINE = "define";
+    public static final String LAMBDA = "lambda";
+    public static final String CONS = "cons";
+    public static final String HEAD = "head";
+    public static final String TAIL = "tail";
+    public static final String EMPTY = "empty";
 
-    public static final Set<AST.Token> MATHS = new HashSet<>(6);
-    public static final Set<Token> ALL_TOKENS = new HashSet<Token>();
+    public static final Set MATHS = new HashSet<>(6);
+    public static final Set ALL_TOKENS = new HashSet();
 
     static {
-        MATHS.add(create(String.class, "+"));
-        MATHS.add(create(String.class, "-"));
-        MATHS.add(create(String.class, "*"));
-        MATHS.add(create(String.class, "/"));
-        MATHS.add(create(String.class, "mod"));
-        MATHS.add(create(String.class, "<"));
-        MATHS.add(create(String.class, ">"));
+        MATHS.add("+");
+        MATHS.add("-");
+        MATHS.add("*");
+        MATHS.add("/");
+        MATHS.add("mod");
+        MATHS.add("<");
+        MATHS.add(">");
 
         ALL_TOKENS.add(QUOTE);
         ALL_TOKENS.add(ATOM);

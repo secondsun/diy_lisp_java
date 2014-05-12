@@ -15,9 +15,9 @@
  */
 package net.saga.diy.lisp.parser.operation;
 
-import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.Evaluator;
 import net.saga.diy.lisp.parser.types.Environment;
+import static net.saga.diy.lisp.parser.types.Utils.isList;
 
 /**
  * 
@@ -25,34 +25,29 @@ import net.saga.diy.lisp.parser.types.Environment;
  */
 public class Eq2Operation implements Operation<Boolean> {
 
-    private final AST.Token firstToken;
+    private final Object firstToken;
 
-    public Eq2Operation(AST.Token firstArgument) {
+    public Eq2Operation(Object firstArgument) {
         this.firstToken = firstArgument;
     }
 
     @Override
-    public Boolean operate(AST.Token secondToken, Environment env) {
+    public Boolean operate(Object secondToken, Environment env) {
         AtomOperation isAtom = new AtomOperation();
 
         Object firstValue;
         Object secondValue;
-        if (firstToken.tree == null) {
-            firstValue = (Evaluator.evaluate(new AST(firstToken), env));
-        } else {
-            firstValue = (Evaluator.evaluate(firstToken.tree, env));
-        }
-        if (secondToken.tree == null) {
-            secondValue = (Evaluator.evaluate(new AST(secondToken), env));
-        } else {
-            secondValue = (Evaluator.evaluate(secondToken.tree, env));
-        }
 
-        if (firstValue instanceof AST || firstValue.getClass().isArray()) {
+        firstValue = (Evaluator.evaluate(firstToken, env));
+
+        secondValue = (Evaluator.evaluate(secondToken, env));
+        
+
+        if (isList(firstValue)) {
             return false;
         }
 
-        if (secondValue instanceof AST || secondValue.getClass().isArray()) {
+        if (isList(secondValue)) {
             return false;
         }
 

@@ -20,19 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.saga.diy.lisp.parser.AST.Token;
-import static net.saga.diy.lisp.parser.AST.Token.create;
 import net.saga.diy.lisp.parser.types.LispException;
 
 public class Parser {
 
     private static final Pattern PATTERN = Pattern.compile("^[^\\s)']+");
 
-    public static Token parse(String source) {
+    public static Object parse(String source) {
         source = source.trim();
         source = removeComments(source);
 
-        Token toReturn;
 
         List<String> expressions = splitExpressions(source);
 
@@ -41,28 +38,28 @@ public class Parser {
                 if (expressions.size() > 1) {
                     throw new LispException("Invalid Expression");
                 }
-                return create(Boolean.class, expression.charAt(1) == 't');
+                return expression.charAt(1) == 't';
             } else if (expression.matches("\\d+")) {
                 if (expressions.size() > 1) {
                     throw new LispException("Invalid Expression");
                 }
 
-                return (create(Integer.class, Integer.parseInt(expression)));
+                return Integer.parseInt(expression);
             } else {
                 if (expression.startsWith("(")) {
                     String subSource = expression.substring(1, expression.length() - 1);
                     
-                    List<Token> tokens = new ArrayList<>();
+                    List<Object> tokens = new ArrayList<>();
                     
                     splitExpressions(subSource).stream().forEach((subExpression) -> {
                         tokens.add(parse(subExpression));
                     });
                     
-                    return create(new AST(tokens.toArray(new Token[tokens.size()])));
+                    return tokens.toArray();
                 } else if (expression.startsWith(")")) {
                     throw new LispException("Expected EOF");
                 } else {
-                    return (create(String.class, expression));
+                    return expression;
                 }
             }
         }

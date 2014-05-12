@@ -16,7 +16,6 @@
 
 package net.saga.diy.lisp.parser.operation;
 
-import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.Evaluator;
 import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
@@ -31,11 +30,11 @@ public class LookupOperation implements Operation {
     }
 
     @Override
-    public Object operate(AST.Token token, Environment env) {
-        Object result = env.lookup((String) token.value);
+    public Object operate(Object token, Environment env) {
+        Object result = env.lookup((String) token);
         if (result instanceof Closure) {
             Closure closure = (Closure) result;
-            if (closure.getParams().size() == 0) {
+            if (closure.getParams().length == 0) {
                 return Evaluator.evaluate(closure.getBody(), closure.getEnv());
             } else {
                 return new ClosureOperation(closure);

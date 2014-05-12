@@ -15,10 +15,10 @@
  */
 package net.saga.diy.lisp.parser;
 
-import static net.saga.diy.lisp.parser.AST.Token.create;
 import static net.saga.diy.lisp.parser.Parser.parse;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -42,7 +42,7 @@ public class EvaluatorTest {
     @Test
     public void evaluateQuote() {
         assertEquals("foo", run("( quote foo)"));
-        assertEquals(new AST(create(Integer.class, 1), create(Integer.class, 2), create(Boolean.class, false)), run("(quote (1 2 #f))"));
+        Assert.assertArrayEquals(new Object[]{1, 2, false}, (Object[])run("(quote (1 2 #f))"));
     }
 
     @Test

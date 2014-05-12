@@ -15,33 +15,35 @@
  */
 package net.saga.diy.lisp.parser.operation;
 
-import net.saga.diy.lisp.parser.AST;
 import static net.saga.diy.lisp.parser.Evaluator.evaluate;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
+import static net.saga.diy.lisp.parser.types.Utils.isEmptyList;
+import static net.saga.diy.lisp.parser.types.Utils.isList;
 
 public class HeadOperation implements Operation<Object> {
 
     @Override
-    public Object operate(AST.Token listToken, Environment env) {
-        if (listToken.tree == null) {
+    public Object operate(Object listToken, Environment env) {
+        if (!isList(listToken)) {
             throw new LispException(listToken + " is not a list");
-        } else if (listToken.tree.tokens.isEmpty()) {
+        } else if (isEmptyList(listToken)) {
             throw new LispException(listToken + " is empty");
         }
 
-        Object result = evaluate(listToken.tree, env);
+        Object result = evaluate((Object[])listToken, env);
 
-        if (result instanceof AST) {
-            AST ast = (AST) result;
-            if (ast.tokens.isEmpty()) {
+        if (isList(result)) {
+            Object[] ast = (Object[]) result;
+            if (isEmptyList(ast)) {
                 throw new LispException(listToken + " is empty");
             }
-            return evaluate(ast.tokens.get(0), env);
+            return evaluate(ast[0], env);
         } else if (result.getClass().isArray()) {
             return ((Object[]) result)[0];
         }
 
         throw new LispException(listToken + " is not a list");
     }
+
 }

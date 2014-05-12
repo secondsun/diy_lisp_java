@@ -17,10 +17,10 @@ package net.saga.diy.lisp.parser.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.saga.diy.lisp.parser.AST;
 import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
+import static net.saga.diy.lisp.parser.types.Utils.isList;
 
 /**
  * 
@@ -29,18 +29,18 @@ import net.saga.diy.lisp.parser.types.LispException;
 public class LambdaOperation implements Operation<Operation<Closure>> {
 
     @Override
-    public Operation<Closure> operate(AST.Token token, Environment env) {
+    public Operation<Closure> operate(Object token, Environment env) {
         extractParams(token);
-        return ((bodyToken, bodyEnv) -> {return new Closure(bodyEnv, token, bodyToken);});
+        return ((bodyToken, bodyEnv) -> {return new Closure(bodyEnv, (Object[]) token, bodyToken);});
     }
 
-    private List<String> extractParams(AST.Token token) {
+    private List<String> extractParams(Object token) {
         ArrayList<String> params = new ArrayList<>();
-        if (token.tree != null) {
-            token.tree.iterator().forEachRemaining(varToken->{
-                assert varToken.type == String.class;
-                params.add((String)varToken.value);
-            });
+        if (isList(token)) {
+            for (Object varToken : (Object[])token) {
+                assert varToken instanceof String;
+                params.add((String)varToken);
+            }
         } else {
                throw new LispException("Lambda vars not list");
         }

@@ -16,50 +16,49 @@
 package net.saga.diy.lisp.parser.operation;
 
 import java.util.List;
-import net.saga.diy.lisp.parser.AST;
-import net.saga.diy.lisp.parser.AST.Token;
-import static net.saga.diy.lisp.parser.AST.Token.create;
 import net.saga.diy.lisp.parser.Evaluator;
 import net.saga.diy.lisp.parser.SpecialTokens;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
+import static net.saga.diy.lisp.parser.types.Utils.isList;
 
 public class ConsOperation implements Operation<Operation> {
 
     @Override
-    public Operation operate(AST.Token toAddToken, Environment env) {
+    public Operation operate(Object toAddToken, Environment env) {
 
         return ((listToken, listEnv) -> {
 
             Object toAddValue;
-            if (toAddToken.tree != null) {
-                toAddValue = Evaluator.evaluate(toAddToken.tree, env);
+            if (isList(toAddToken)) {
+                toAddValue = Evaluator.evaluate((Object[])toAddToken, env);
             } else {
-                toAddValue = toAddToken.value;
+                toAddValue = toAddToken;
             }
 
-            if (listToken.tree == null) {
+            if (!isList(listToken)) {
                 throw new LispException(listToken + " is not a list");
             }
 
-            Token[] tokens;
+            Object[] listTokens = (Object[]) listToken;
+            Object[] tokens;
 
-            if (SpecialTokens.ALL_TOKENS.contains(listToken.tree.tokens.get(0))) {
-                List<Token> listOfTokens = ((AST) Evaluator.evaluate(listToken.tree, env)).tokens;
-                tokens = new Token[listOfTokens.size() + 1];
-                tokens[0] = create(toAddValue.getClass(), toAddValue);
+            if (SpecialTokens.ALL_TOKENS.contains(listTokens[0])) {
+                Object[] listOfTokens = ((Object[]) Evaluator.evaluate(listTokens, env));
+                tokens = new Object[listOfTokens.length + 1];
+                tokens[0] = toAddValue;
                 for (int i = 1; i < tokens.length; i++) {
-                    tokens[i] = listOfTokens.get(i - 1);
+                    tokens[i] = listOfTokens[i - 1];
                 }
             } else {
-                tokens = new Token[listToken.tree.tokens.size() + 1];
-                tokens[0] = create(toAddValue.getClass(), toAddValue);
+                tokens = new Object[listTokens.length + 1];
+                tokens[0] = toAddValue;
                 for (int i = 1; i < tokens.length; i++) {
-                    tokens[i] = (Token) Evaluator.evaluate(listToken.tree.tokens.get(i - 1), env);
+                    tokens[i] = (Object) Evaluator.evaluate((Object[]) listTokens[i - 1], env);
                 }
             }
 
-            return new AST(tokens);
+            return tokens;
         });
     }
 }
