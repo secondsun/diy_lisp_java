@@ -1,1 +1,4 @@
-(define echo (lambda (x) x)
+(define echo (lambda (x) x))
+(define double_echo (lambda (x) ((cons x (cons x '())))))
+(define not (lambda (exp) (eq #f exp)))
+(define or (lambda (first second) (if first #t (if second #t #f))))

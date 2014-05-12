@@ -112,7 +112,7 @@ public class Parser {
             String remaining = buff.toString();
             Matcher match = PATTERN.matcher(remaining);
             if (!match.lookingAt()) {
-                throw new LispException("Illegal start of expression");
+                throw new LispException("Illegal start of expression:"+remaining);
             }
             int end = match.end();
             arr = new char[end];

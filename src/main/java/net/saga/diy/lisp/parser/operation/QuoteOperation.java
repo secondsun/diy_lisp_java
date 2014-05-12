@@ -29,7 +29,7 @@ public class QuoteOperation implements Operation<Object> {
         if (token instanceof String) {
             return token;
         } else {
-            return (Object[]) token;
+            return token;
         }
     }
 

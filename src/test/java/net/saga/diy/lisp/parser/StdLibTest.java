@@ -8,7 +8,16 @@ import static net.saga.diy.lisp.parser.Interpreter.interpretFile;
 import static net.saga.diy.lisp.parser.Parser.parse;
 import net.saga.diy.lisp.parser.types.Environment;
 import org.junit.Assert;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,4 +52,23 @@ public class StdLibTest {
         assertEquals("foo", evaluate(parse("(echo ('foo))"), env));
     }
     
+    @Test
+    public void testDoubleEcho() {
+        assertArrayEquals(new Object[]{"foo", "foo"}, (Object[])evaluate(parse("(double_echo ('foo))"), env));
+    }
+    
+    
+    @Test
+    public void testNot() {
+        assertTrue((boolean)evaluate(parse("(not #f)"), env));
+        assertFalse((boolean)evaluate(parse("(not #t)"), env));
+    }
+    
+    @Test
+    public void testOr() {
+        assertFalse((boolean)evaluate(parse("(or #f #f)"), env));
+        assertTrue((boolean)evaluate(parse("(or #f #t)"), env));
+        assertTrue((boolean)evaluate(parse("(or #t #f)"), env));
+        assertTrue((boolean)evaluate(parse("(or #t #t)"), env));
+    }
 }
