@@ -47,13 +47,13 @@ public class ConsOperation implements Operation<Operation> {
             if (SpecialTokens.ALL_TOKENS.contains(listToken.tree.tokens.get(0))) {
                 List<Token> listOfTokens = ((AST) Evaluator.evaluate(listToken.tree, env)).tokens;
                 tokens = new Token[listOfTokens.size() + 1];
-                tokens[0] = create(toAddToken.getClass(), toAddToken);
+                tokens[0] = create(toAddValue.getClass(), toAddValue);
                 for (int i = 1; i < tokens.length; i++) {
                     tokens[i] = listOfTokens.get(i - 1);
                 }
             } else {
                 tokens = new Token[listToken.tree.tokens.size() + 1];
-                tokens[0] = create(toAddToken.getClass(), toAddToken);
+                tokens[0] = create(toAddValue.getClass(), toAddValue);
                 for (int i = 1; i < tokens.length; i++) {
                     tokens[i] = (Token) Evaluator.evaluate(listToken.tree.tokens.get(i - 1), env);
                 }
