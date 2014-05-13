@@ -20,7 +20,7 @@ package net.saga.diy.lisp.parser;
 
 import static net.saga.diy.lisp.parser.Parser.parse;
 import net.saga.diy.lisp.parser.types.LispException;
-import static net.saga.diy.lisp.parser.types.Utils.isList;
+import static net.saga.diy.lisp.parser.Utils.isList;
 import org.junit.Assert;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

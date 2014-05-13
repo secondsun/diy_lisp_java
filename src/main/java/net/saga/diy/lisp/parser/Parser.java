@@ -32,43 +32,7 @@ public class Parser {
     private static final Pattern PATTERN = Pattern.compile("^[^\\s)']+");
 
     public static Object parse(String source) {
-        source = source.trim();
-        source = removeComments(source);
-
-
-        List<String> expressions = splitExpressions(source);
-
-        for (String expression : expressions) {
-            if (expression.matches("#\\w")) {
-                if (expressions.size() > 1) {
-                    throw new LispException("Invalid Expression");
-                }
-                return expression.charAt(1) == 't';
-            } else if (expression.matches("\\d+")) {
-                if (expressions.size() > 1) {
-                    throw new LispException("Invalid Expression");
-                }
-
-                return Integer.parseInt(expression);
-            } else {
-                if (expression.startsWith("(")) {
-                    String subSource = expression.substring(1, expression.length() - 1);
-                    
-                    List<Object> tokens = new ArrayList<>();
-                    
-                    splitExpressions(subSource).stream().forEach((subExpression) -> {
-                        tokens.add(parse(subExpression));
-                    });
-                    
-                    return tokens.toArray();
-                } else if (expression.startsWith(")")) {
-                    throw new LispException("Expected EOF");
-                } else {
-                    return expression;
-                }
-            }
-        }
-        throw new LispException("Expected EOF");
+        throw new IllegalStateException("not implemented");
 
     }
 

@@ -16,25 +16,42 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation;
+package net.saga.diy.lisp.parser;
 
-import net.saga.diy.lisp.parser.Evaluator;
-import net.saga.diy.lisp.parser.types.Environment;
+import java.util.Map;
 import net.saga.diy.lisp.parser.types.LispException;
-import net.saga.diy.lisp.parser.types.Utils;
-import static net.saga.diy.lisp.parser.types.Utils.isList;
 
-public class EmptyOperation implements Operation<Boolean> {
+/**
+ * 
+ * @author summers
+ */
+public class Utils {
 
-    @Override
-    public Boolean operate(Object listToken, Environment firstEnv) {
-        if (!isList(listToken)) {
-            throw new LispException(listToken + " is not a list");
+    public static <K, V> V getOrThrow(Map<K, V> map, K key) {
+
+        V value = map.get(key);
+
+        if (value == null) {
+            throw new LispException("No value " + key);
         }
-        Object res = Evaluator.evaluate((Object[]) listToken, firstEnv);
 
-        return Utils.isEmptyList(res);
+        return value;
+    }
 
+    public static boolean isList(Object token) {
+        try {
+            return token.getClass().isArray();
+        } catch (Exception ignore) {
+            throw new LispException("Illegal token:" + token);
+        }
+    }
+
+    public static boolean isEmptyList(Object token) {
+        try {
+            return ((Object[]) token).length == 0;
+        } catch (Exception ignore) {
+            throw new LispException("Illegal token:" + token);
+        }
     }
 
 }

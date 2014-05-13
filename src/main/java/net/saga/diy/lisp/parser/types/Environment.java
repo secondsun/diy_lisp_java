@@ -19,7 +19,6 @@
 package net.saga.diy.lisp.parser.types;
 
 import java.util.HashMap;
-import static net.saga.diy.lisp.parser.types.Utils.getOrThrow;
 
 /**
  * 
@@ -30,38 +29,23 @@ public class Environment {
     private final HashMap<String, Object> variables;
 
     public Environment() {
-        this.variables = new HashMap<>();
+        throw new IllegalStateException("not implemented");
     }
 
     public Environment(HashMap variables) {
-        if (variables == null) {
-            this.variables = new HashMap<>();
-        } else {
-            this.variables = new HashMap<>(variables);
-        }
-    }
-
-    public Environment(Environment originalEnvironment) {
-
-        this.variables = new HashMap<>(originalEnvironment.variables);
-
+        throw new IllegalStateException("not implemented");
     }
 
     public Object lookup(String varName) {
-        return getOrThrow(variables, varName);
+        throw new IllegalStateException("not implemented");
     }
 
     public Environment extend(String name, Object value) {
-        HashMap<String, Object> newVars = new HashMap<>(variables);
-        newVars.put(name, value);
-        return new Environment(newVars);
+        throw new IllegalStateException("not implemented");
     }
 
     public void set(String name, Object value) {
-        if (variables.containsKey(name)) {
-            throw new LispException("Variable " + name + " is already defined");
-        }
-        variables.put(name, value);
+        throw new IllegalStateException("not implemented");
     }
 
 }

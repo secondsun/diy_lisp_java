@@ -18,35 +18,22 @@
  */
 package net.saga.diy.lisp.parser.types;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class Closure {
 
-    private final List<Object> params;
-    private final Environment env;
-    private final Object body;
-
     public Closure(Environment env, Object[] params, Object body) {
-        this.env = env;
-
-        this.params = Arrays.asList(params);
-
-        this.body = body;
-
+        throw new IllegalStateException("not implemented");
     }
 
     public Environment getEnv() {
-        return env;
+        throw new IllegalStateException("not implemented");
     }
 
     public Object[] getParams() {
-        return new ArrayList<>(params).toArray();
+        throw new IllegalStateException("not implemented");
     }
 
     public Object getBody() {
-        return body;
+        throw new IllegalStateException("not implemented");
     }
 
 }

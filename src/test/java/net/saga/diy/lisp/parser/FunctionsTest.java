@@ -30,7 +30,7 @@ import static net.saga.diy.lisp.parser.Parser.parse;
 import net.saga.diy.lisp.parser.types.Closure;
 import net.saga.diy.lisp.parser.types.Environment;
 import net.saga.diy.lisp.parser.types.LispException;
-import static net.saga.diy.lisp.parser.types.Utils.isList;
+import static net.saga.diy.lisp.parser.Utils.isList;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
