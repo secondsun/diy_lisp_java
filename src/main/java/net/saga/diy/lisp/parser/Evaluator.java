@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This project is based on, borrows heavily from, and copies the documentation of
+ * https://github.com/kvalle/diy-lisp/
  */
 package net.saga.diy.lisp.parser;
 
@@ -42,8 +45,8 @@ public class Evaluator {
 
     private static Object evaluateSingle(Object token, Environment env) {
         if (token.getClass().isArray()) {
-            validateTreeForEvaluation((Object[])token, env);
-            return evaluate((Object[])token, env);
+            validateTreeForEvaluation((Object[]) token, env);
+            return evaluate((Object[]) token, env);
         } else if (token.getClass() == Boolean.class) {
             return (token);
         } else if (token.getClass() == Integer.class) {
@@ -62,7 +65,7 @@ public class Evaluator {
         if (!isList(input)) {
             return evaluateSingle(input, env);
         }
-        Object[]ast = (Object[]) input;
+        Object[] ast = (Object[]) input;
         validateTreeForEvaluation(ast, env);
         ArrayList value = new ArrayList();
         Operation operation = null;
@@ -70,7 +73,7 @@ public class Evaluator {
         for (int pointer = 0; pointer < length; pointer++) {
             Object token = ast[pointer];
             if (token.getClass().isArray()) {
-                Object res = evaluate((Object[])token, env);
+                Object res = evaluate((Object[]) token, env);
                 if (res.getClass().isArray()) {
                     Object[] arrayRes = (Object[]) res;
                     for (Object arrayObject : arrayRes) {
@@ -110,7 +113,7 @@ public class Evaluator {
                         operation = new HeadOperation();
                     } else if (SpecialTokens.TAIL.equals(token)) {
                         operation = new TailOperation();
-                    }  else if (SpecialTokens.EMPTY.equals(token)) {
+                    } else if (SpecialTokens.EMPTY.equals(token)) {
                         operation = new EmptyOperation();
                     } else if (SpecialTokens.LAMBDA.equals(token)) {
                         operation = new LambdaOperation();
@@ -140,10 +143,10 @@ public class Evaluator {
                         value.add(res);
                     }
 
-                    if ((pointer + 1) != ast.length)  {
+                    if ((pointer + 1) != ast.length) {
                         throw new LispException("Expected end of expression at " + ast[pointer]);
                     }
-                    
+
                     operation = null;
 
                 } else if (token.getClass() == Boolean.class) {
@@ -156,9 +159,9 @@ public class Evaluator {
                     Environment envClosure = new Environment(closure.getEnv());
                     Object[] vars = closure.getParams();
                     for (Object var : vars) {
-                        envClosure.set((String) var, evaluate((Object)ast[++pointer], env));
+                        envClosure.set((String) var, evaluate((Object) ast[++pointer], env));
                     }
-                    
+
                     value.add(evaluate((closure).getBody(), envClosure));
                 }
             }
@@ -167,7 +170,7 @@ public class Evaluator {
         if (value.size() == 1) {
             return value.get(0);
         }
-        
+
         if (value.isEmpty()) {
             return Void.class;
         } else {
@@ -182,7 +185,7 @@ public class Evaluator {
                 return evaluate(closureTokens.toArray(), env);
 
             } else {
-                //throw new LispException("Illegal tokens " + valueArray[0]);
+                // throw new LispException("Illegal tokens " + valueArray[0]);
                 return valueArray;
             }
         }
@@ -213,9 +216,9 @@ public class Evaluator {
 
                 }
 
-            } else if (token  instanceof Boolean) {
+            } else if (token instanceof Boolean) {
                 throw new LispException("List is not a function call: " + tree);
-            } else if (token  instanceof Integer) {
+            } else if (token instanceof Integer) {
                 throw new LispException("List is not a function call: " + tree);
             } else if (token instanceof Closure) {
                 return;

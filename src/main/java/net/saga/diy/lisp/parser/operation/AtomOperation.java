@@ -12,8 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This project is based on, borrows heavily from, and copies the documentation of
+ * https://github.com/kvalle/diy-lisp/
  */
-
 package net.saga.diy.lisp.parser.operation;
 
 import net.saga.diy.lisp.parser.SpecialTokens;
@@ -38,9 +40,9 @@ public class AtomOperation implements Operation<Boolean> {
         if (!token.getClass().isArray()) {
             return true;
         }
-        
+
         Object[] tokenArr = (Object[]) token;
-        
+
         return SpecialTokens.QUOTE.equals(tokenArr[0]) &&
                 tokenArr.length == 2 &&
                 !tokenArr[1].getClass().isArray();

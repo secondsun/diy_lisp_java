@@ -1,17 +1,20 @@
 /**
  * Copyright Summers Pittman, and individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * This project is based on, borrows heavily from, and copies the documentation of
+ * https://github.com/kvalle/diy-lisp/
  */
 package net.saga.diy.lisp.parser;
 
@@ -39,10 +42,10 @@ public class ParserTest {
     }
 
     /*
-     Parsing single booleans.
-
-     Booleans are the special symbols #t and #f. In the ASTs they are represented
-     by Java's true and false, respectively.
+     * Parsing single booleans.
+     * 
+     * Booleans are the special symbols #t and #f. In the ASTs they are represented
+     * by Java's true and false, respectively.
      */
     @Test
     public void testSingleNUmber() {
@@ -55,10 +58,9 @@ public class ParserTest {
     }
 
     /*
-     Parsing single integer.
-
-     Integers are represented in the ASTs as Java ints.
-
+     * Parsing single integer.
+     * 
+     * Integers are represented in the ASTs as Java ints.
      */
     @Test
     public void testParseBoolean() {
@@ -70,36 +72,36 @@ public class ParserTest {
     }
 
     /*
-     Parsing list of only symbols.
-
-     A list is represented by a number of elements surrounded by parens. Python lists
-     are used to represent lists as ASTs.
-
-     Tip: The useful helper function `find_matching_paren` is already provided in
-     `Parser`.
+     * Parsing list of only symbols.
+     * 
+     * A list is represented by a number of elements surrounded by parens. Python lists
+     * are used to represent lists as ASTs.
+     * 
+     * Tip: The useful helper function `find_matching_paren` is already provided in
+     * `Parser`.
      */
     @Test
     public void testParseListOfSymbols() {
         Object[] token = (Object[]) Parser.parse("(foo bar baz)");
 
-        assertArrayEquals(new String[]{"foo", "bar", "baz"}, token);
+        assertArrayEquals(new String[] { "foo", "bar", "baz" }, token);
 
     }
 
     /*
-     Parsing a list containing different types.
-
-     When parsing lists, make sure each of the sub-expressions are also parsed
-     properly.
+     * Parsing a list containing different types.
+     * 
+     * When parsing lists, make sure each of the sub-expressions are also parsed
+     * properly.
      */
     @Test
     public void testParseListOfMixedTypes() {
         Object[] token = (Object[]) parse("(foo #t 123)");
-        assertArrayEquals(new Object[]{"foo", true, 123}, token);
+        assertArrayEquals(new Object[] { "foo", true, 123 }, token);
 
     }
 
-    /*Parsing should also handle nested lists properly*/
+    /* Parsing should also handle nested lists properly */
     @Test
     public void testParseOfNestedList() {
         Object[] token = (Object[]) Parser.parse("(foo (bar ((#t)) x) (baz y))");
@@ -114,24 +116,24 @@ public class ParserTest {
 
     }
 
-    /*The proper exception should be raised if the expresions is incomplete.*/
+    /* The proper exception should be raised if the expresions is incomplete. */
     @Test(expected = LispException.class)
     public void testMissingExpression() {
         parse("(foo (bar ((#t)) x) (baz y");
     }
 
     /*
-     Another exception is raised if the expression is too large.
-
-     The parse function expects to recieve only one single expression. Anything
-     more than this, should result in the proper exception.
+     * Another exception is raised if the expression is too large.
+     * 
+     * The parse function expects to recieve only one single expression. Anything
+     * more than this, should result in the proper exception.
      */
     @Test(expected = LispException.class)
     public void testExtraParenException() {
         parse("(foo (bar x y)))");
     }
 
-    /*Excess whitespace should be removed.*/
+    /* Excess whitespace should be removed. */
     @Test
     public void parseExtraWhitespace() {
         Object[] tree = (Object[]) parse("                             \n"
@@ -147,7 +149,7 @@ public class ParserTest {
         assertEquals(tree[3], "whitespace");
     }
 
-    /*All comments should be stripped away as part of the parsing.*/
+    /* All comments should be stripped away as part of the parsing. */
     @Test
     public void parseComments() {
         Object[] root = (Object[]) parse(" ;; this first line is a comment\n"
@@ -164,13 +166,13 @@ public class ParserTest {
         ((Object[]) expected[2])[0] = "if";
         ((Object[]) expected[2])[1] = (true);
         ((Object[]) expected[2])[2] = (42);
-        ((Object[]) expected[2])[3] = (new Object[]{"something", "else"});
+        ((Object[]) expected[2])[3] = (new Object[] { "something", "else" });
 
         assertArrayEquals(expected, root);
 
     }
 
-    /*Test a larger example to check that everything works as expected*/
+    /* Test a larger example to check that everything works as expected */
     @Test
     public void testLargeFile() {
         Object[] ast = (Object[]) parse(" "
@@ -182,24 +184,30 @@ public class ParserTest {
                 + "; the existence of negative numbers\n"
                 + "(* n (fact (- n 1))))))");
 
-        Object[] expected = new Object[]{"define", "fact", new Object[]{
-            "lambda", new Object[]{"n"}, new Object[]{"if", new Object[]{"<=", "n", 1}, 1, new Object[]{"*", "n", new Object[]{"fact", new Object[]{"-", "n", 1}}}}}};
+        Object[] expected = new Object[] {
+                "define",
+                "fact",
+                new Object[] {
+                        "lambda", new Object[] { "n" },
+                        new Object[] { "if", new Object[] { "<=", "n", 1 }, 1, new Object[] { "*", "n", new Object[] { "fact", new Object[] { "-", "n", 1 } } } } } };
 
         assertArrayEquals(expected, ast);
 
     }
 
-    /*Quoting is a shorthand syntax for calling the `quote` form.
-
-     Examples:
-
-     'foo -> (quote foo)
-     '(foo bar) -> (quote (foo bar))*/
+    /*
+     * Quoting is a shorthand syntax for calling the `quote` form.
+     * 
+     * Examples:
+     * 
+     * 'foo -> (quote foo)
+     * '(foo bar) -> (quote (foo bar))
+     */
     @Test
     public void testQuotes() {
         Object[] ast = (Object[]) parse("(foo 'nil)");
 
-        Object expected = new Object[]{"foo", new Object[]{"quote", "nil"}};
+        Object expected = new Object[] { "foo", new Object[] { "quote", "nil" } };
 
         Assert.assertArrayEquals((Object[]) expected, ast);
 
@@ -208,7 +216,7 @@ public class ParserTest {
     @Test
     public void testNestedQuotes() {
         Object[] ast = (Object[]) parse("''''foo");
-        Object[] expected = new Object[]{"quote", new Object[]{"quote", new Object[]{"quote", new Object[]{"quote", "foo"}}}};
+        Object[] expected = new Object[] { "quote", new Object[] { "quote", new Object[] { "quote", new Object[] { "quote", "foo" } } } };
 
         Assert.assertArrayEquals(expected, ast);
     }

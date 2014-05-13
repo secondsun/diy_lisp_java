@@ -15,6 +15,9 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
+    This project is based on, borrows heavily from, and copies the documentation of
+    https://github.com/kvalle/diy-lisp/
+
 -->
 <profiles version="12">
 <profile kind="CodeFormatterProfile" name="AeroGear" version="12">

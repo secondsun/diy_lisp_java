@@ -1,17 +1,20 @@
 /**
  * Copyright Summers Pittman, and individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * This project is based on, borrows heavily from, and copies the documentation of
+ * https://github.com/kvalle/diy-lisp/
  */
 package net.saga.diy.lisp.parser;
 
@@ -28,33 +31,37 @@ public class EvaluatorTest {
 
     private static Environment ENV = new Environment();
 
-    /*Booleans should evaluate to themselves*/
+    /* Booleans should evaluate to themselves */
     @Test
     public void testEvaluatingBoolean() {
         assertTrue((boolean) run("#t"));
         assertFalse((boolean) run("#f"));
     }
 
-    /*...and so should integers.*/
+    /* ...and so should integers. */
     @Test
     public void testEvaluateInteger() {
         assertEquals(42, (int) run("42"));
     }
 
-    /*When a call is done to the `quote` form, the argument should be returned without
-     being evaluated.
-
-     (quote foo) -> foo*/
+    /*
+     * When a call is done to the `quote` form, the argument should be returned without
+     * being evaluated.
+     * 
+     * (quote foo) -> foo
+     */
     @Test
     public void evaluateQuote() {
         assertEquals("foo", run("( quote foo)"));
-        Assert.assertArrayEquals(new Object[]{1, 2, false}, (Object[]) run("(quote (1 2 #f))"));
+        Assert.assertArrayEquals(new Object[] { 1, 2, false }, (Object[]) run("(quote (1 2 #f))"));
     }
 
-    /*The `atom` form is used to determine whether an expression is an atom.
-
-     Atoms are expressions that are not list, i.e. integers, booleans or symbols.
-     Remember that the argument to `atom` must be evaluated before the check is done.*/
+    /*
+     * The `atom` form is used to determine whether an expression is an atom.
+     * 
+     * Atoms are expressions that are not list, i.e. integers, booleans or symbols.
+     * Remember that the argument to `atom` must be evaluated before the check is done.
+     */
     @Test
     public void evaluateAtom() {
         assertTrue((boolean) run("(atom #t)"));
@@ -64,7 +71,7 @@ public class EvaluatorTest {
         assertFalse((boolean) run("(atom '(1 2))"));
     }
 
-    /*The `eq` form is used to check whether two expressions are the same atom.*/
+    /* The `eq` form is used to check whether two expressions are the same atom. */
     @Test
     public void evaluateEq() {
         assertTrue((boolean) run("(eq 1 1)"));
@@ -74,10 +81,11 @@ public class EvaluatorTest {
         assertFalse((boolean) run("(eq '(1 2 3) '(1 2 3))"));
     }
 
-    /*To be able to do anything useful, we need some basic math operators.
-
-     Since we only operate with integers, `/` must represent integer division.
-     `mod` is the modulo operator.
+    /*
+     * To be able to do anything useful, we need some basic math operators.
+     * 
+     * Since we only operate with integers, `/` must represent integer division.
+     * `mod` is the modulo operator.
      */
     @Test
     public void evaluateMath() {
@@ -100,7 +108,7 @@ public class EvaluatorTest {
 
     }
 
-    /*The math functions should only allow numbers as arguments.*/
+    /* The math functions should only allow numbers as arguments. */
     @Test(expected = LispException.class)
     public void mathOnlyUsesInteger() {
         assertEquals(false, run("> 7 'foo"));

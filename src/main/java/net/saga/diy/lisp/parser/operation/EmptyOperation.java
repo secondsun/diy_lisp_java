@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This project is based on, borrows heavily from, and copies the documentation of
+ * https://github.com/kvalle/diy-lisp/
  */
 package net.saga.diy.lisp.parser.operation;
 
@@ -28,10 +31,10 @@ public class EmptyOperation implements Operation<Boolean> {
         if (!isList(listToken)) {
             throw new LispException(listToken + " is not a list");
         }
-        Object res = Evaluator.evaluate((Object[])listToken, firstEnv);
-        
+        Object res = Evaluator.evaluate((Object[]) listToken, firstEnv);
+
         return Utils.isEmptyList(res);
-        
+
     }
 
 }

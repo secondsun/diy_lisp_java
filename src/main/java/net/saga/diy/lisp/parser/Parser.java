@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This project is based on, borrows heavily from, and copies the documentation of
+ * https://github.com/kvalle/diy-lisp/
  */
 package net.saga.diy.lisp.parser;
 
@@ -112,7 +115,7 @@ public class Parser {
             String remaining = buff.toString();
             Matcher match = PATTERN.matcher(remaining);
             if (!match.lookingAt()) {
-                throw new LispException("Illegal start of expression:"+remaining);
+                throw new LispException("Illegal start of expression:" + remaining);
             }
             int end = match.end();
             arr = new char[end];
@@ -157,31 +160,31 @@ public class Parser {
         int parens = 0;
         boolean expressionStarted = false;
         List<Object> expressions = new ArrayList<>();
-        
+
         StringBuilder builder = new StringBuilder();
         try {
-            while ((chara = (char) reader.read()) != (char)-1) {
+            while ((chara = (char) reader.read()) != (char) -1) {
                 if (chara == '(') {
                     parens++;
                     expressionStarted = true;
                 } else if (chara == ')') {
                     parens--;
                 }
-                
+
                 builder.append(chara);
-                
+
                 if (expressionStarted && parens == 0) {
                     expressionStarted = false;
                     expressions.add(parse(builder.toString()));
                     builder = new StringBuilder();
                 }
-                
+
             }
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        
+
         return expressions.toArray();
     }
-    
+
 }

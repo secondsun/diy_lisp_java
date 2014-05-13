@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This project is based on, borrows heavily from, and copies the documentation of
+ * https://github.com/kvalle/diy-lisp/
  */
 package net.saga.diy.lisp.parser.operation;
 
@@ -28,26 +31,26 @@ public class TailOperation implements Operation<Object[]> {
 
     @Override
     public Object[] operate(Object listToken, Environment env) {
-        
+
         if (!listToken.getClass().isArray()) {
             throw new LispException(listToken + " is not a list");
         }
-        
+
         Object[] listArr = (Object[]) listToken;
-        
+
         if (listArr.length == 0) {
             throw new LispException(listToken + " is empty");
         }
-        
+
         Object result = evaluate(listArr, env);
-        
+
         if (result.getClass().isArray()) {
             Object[] ast = (Object[]) result;
-            if (ast.length == 0 ) {
+            if (ast.length == 0) {
                 throw new LispException(ast + " is empty");
             }
             return Arrays.copyOfRange(ast, 1, ast.length);
-        } 
+        }
         throw new LispException(result + " is not a list");
     }
 }
