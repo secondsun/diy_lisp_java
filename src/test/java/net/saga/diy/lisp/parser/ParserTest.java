@@ -18,9 +18,10 @@
  */
 package net.saga.diy.lisp.parser;
 
-import static net.saga.diy.lisp.parser.Parser.parse;
-import net.saga.diy.lisp.parser.types.LispException;
-import static net.saga.diy.lisp.parser.types.Utils.isList;
+import net.saga.diy.lisp.Parser;
+import static net.saga.diy.lisp.Parser.parse;
+import net.saga.diy.lisp.types.LispException;
+import static net.saga.diy.lisp.types.Utils.isList;
 import org.junit.Assert;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

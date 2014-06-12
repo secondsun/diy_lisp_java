@@ -16,41 +16,22 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.types;
+package net.saga.diy.lisp.evaluator.operation;
 
-import java.util.Map;
+import net.saga.diy.lisp.types.Environment;
 
 /**
  * 
  * @author summers
  */
-public class Utils {
+public class EqOperation implements Operation<Eq2Operation> {
 
-    public static <K, V> V getOrThrow(Map<K, V> map, K key) {
-
-        V value = map.get(key);
-
-        if (value == null) {
-            throw new LispException("No value " + key);
-        }
-
-        return value;
+    public EqOperation() {
     }
 
-    public static boolean isList(Object token) {
-        try {
-            return token.getClass().isArray();
-        } catch (Exception ignore) {
-            throw new LispException("Illegal token:" + token);
-        }
-    }
-
-    public static boolean isEmptyList(Object token) {
-        try {
-            return ((Object[]) token).length == 0;
-        } catch (Exception ignore) {
-            throw new LispException("Illegal token:" + token);
-        }
+    @Override
+    public Eq2Operation operate(Object token, Environment env) {
+        return new Eq2Operation(token);
     }
 
 }

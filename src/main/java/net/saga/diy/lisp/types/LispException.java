@@ -16,10 +16,12 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser;
+package net.saga.diy.lisp.types;
 
-public class Program {
-    public Object run(){
-                throw new UnsupportedOperationException("Not supported yet.");
+public class LispException extends RuntimeException {
+
+    public LispException(String message) {
+        super(message);
     }
+
 }

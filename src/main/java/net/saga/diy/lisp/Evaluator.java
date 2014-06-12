@@ -16,30 +16,30 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser;
+package net.saga.diy.lisp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import static net.saga.diy.lisp.parser.SpecialTokens.QUOTE;
-import net.saga.diy.lisp.parser.operation.AtomOperation;
-import net.saga.diy.lisp.parser.operation.ConsOperation;
-import net.saga.diy.lisp.parser.operation.DefineOperation;
-import net.saga.diy.lisp.parser.operation.EmptyOperation;
-import net.saga.diy.lisp.parser.operation.EqOperation;
-import net.saga.diy.lisp.parser.operation.HeadOperation;
-import net.saga.diy.lisp.parser.operation.IfOperation;
-import net.saga.diy.lisp.parser.operation.LambdaOperation;
-import net.saga.diy.lisp.parser.operation.LookupOperation;
-import net.saga.diy.lisp.parser.operation.Operation;
-import net.saga.diy.lisp.parser.operation.QuoteOperation;
-import net.saga.diy.lisp.parser.operation.TailOperation;
-import net.saga.diy.lisp.parser.operation.math.MathOperation;
-import net.saga.diy.lisp.parser.types.Closure;
-import net.saga.diy.lisp.parser.types.Environment;
-import net.saga.diy.lisp.parser.types.LispException;
-import static net.saga.diy.lisp.parser.types.Utils.isList;
+import static net.saga.diy.lisp.SpecialTokens.QUOTE;
+import net.saga.diy.lisp.evaluator.operation.AtomOperation;
+import net.saga.diy.lisp.evaluator.operation.ConsOperation;
+import net.saga.diy.lisp.evaluator.operation.DefineOperation;
+import net.saga.diy.lisp.evaluator.operation.EmptyOperation;
+import net.saga.diy.lisp.evaluator.operation.EqOperation;
+import net.saga.diy.lisp.evaluator.operation.HeadOperation;
+import net.saga.diy.lisp.evaluator.operation.IfOperation;
+import net.saga.diy.lisp.evaluator.operation.LambdaOperation;
+import net.saga.diy.lisp.evaluator.operation.LookupOperation;
+import net.saga.diy.lisp.evaluator.operation.Operation;
+import net.saga.diy.lisp.evaluator.operation.QuoteOperation;
+import net.saga.diy.lisp.evaluator.operation.TailOperation;
+import net.saga.diy.lisp.evaluator.operation.MathOperation;
+import net.saga.diy.lisp.types.Closure;
+import net.saga.diy.lisp.types.Environment;
+import net.saga.diy.lisp.types.LispException;
+import static net.saga.diy.lisp.types.Utils.isList;
 
 public class Evaluator {
 

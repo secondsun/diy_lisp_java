@@ -16,37 +16,24 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.types;
+package net.saga.diy.lisp.evaluator.operation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import net.saga.diy.lisp.Evaluator;
+import net.saga.diy.lisp.types.Environment;
+import net.saga.diy.lisp.types.LispException;
 
-public class Closure {
+public class DefineOperation implements Operation<Operation> {
 
-    private final List<Object> params;
-    private final Environment env;
-    private final Object body;
-
-    public Closure(Environment env, Object[] params, Object body) {
-        this.env = env;
-
-        this.params = Arrays.asList(params);
-
-        this.body = body;
-
+    @Override
+    public Operation<Void> operate(Object name, Environment env) {
+        
+        if (!(name instanceof String)) {
+            throw new LispException("Illegal define name token");
+        }
+        
+        return ((value, env2) ->{
+            env2.set((String) name, Evaluator.evaluate(value, env2));
+            return null;
+        });
     }
-
-    public Environment getEnv() {
-        return env;
-    }
-
-    public Object[] getParams() {
-        return new ArrayList<>(params).toArray();
-    }
-
-    public Object getBody() {
-        return body;
-    }
-
 }

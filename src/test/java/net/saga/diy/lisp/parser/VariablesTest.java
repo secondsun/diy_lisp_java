@@ -18,11 +18,13 @@
  */
 package net.saga.diy.lisp.parser;
 
+import net.saga.diy.lisp.Parser;
+import net.saga.diy.lisp.Evaluator;
 import java.util.HashMap;
-import static net.saga.diy.lisp.parser.Evaluator.evaluate;
-import static net.saga.diy.lisp.parser.Parser.parse;
-import net.saga.diy.lisp.parser.types.Environment;
-import net.saga.diy.lisp.parser.types.LispException;
+import static net.saga.diy.lisp.Evaluator.evaluate;
+import static net.saga.diy.lisp.Parser.parse;
+import net.saga.diy.lisp.types.Environment;
+import net.saga.diy.lisp.types.LispException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;

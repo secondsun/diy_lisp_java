@@ -16,7 +16,7 @@
  * This project is based on, borrows heavily from, and copies the documentation
  * of https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser;
+package net.saga.diy.lisp;
 
 import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.JiteClass;

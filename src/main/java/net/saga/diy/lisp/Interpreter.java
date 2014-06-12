@@ -16,7 +16,7 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser;
+package net.saga.diy.lisp;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static net.saga.diy.lisp.parser.Evaluator.evaluate;
-import static net.saga.diy.lisp.parser.Parser.parse;
-import net.saga.diy.lisp.parser.types.Environment;
+import static net.saga.diy.lisp.Evaluator.evaluate;
+import static net.saga.diy.lisp.Parser.parse;
+import net.saga.diy.lisp.types.Environment;
 
 public class Interpreter {
 

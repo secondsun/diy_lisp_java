@@ -16,23 +16,37 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation;
+package net.saga.diy.lisp.types;
 
-import net.saga.diy.lisp.parser.types.Environment;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-/**
- * 
- * @author summers
- */
-public class QuoteOperation implements Operation<Object> {
+public class Closure {
 
-    @Override
-    public Object operate(Object token, Environment env) {
-        if (token instanceof String) {
-            return token;
-        } else {
-            return token;
-        }
+    private final List<Object> params;
+    private final Environment env;
+    private final Object body;
+
+    public Closure(Environment env, Object[] params, Object body) {
+        this.env = env;
+
+        this.params = Arrays.asList(params);
+
+        this.body = body;
+
+    }
+
+    public Environment getEnv() {
+        return env;
+    }
+
+    public Object[] getParams() {
+        return new ArrayList<>(params).toArray();
+    }
+
+    public Object getBody() {
+        return body;
     }
 
 }

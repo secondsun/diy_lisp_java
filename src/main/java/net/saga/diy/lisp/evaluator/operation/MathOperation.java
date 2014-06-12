@@ -16,12 +16,12 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation.math;
+package net.saga.diy.lisp.evaluator.operation;
 
-import net.saga.diy.lisp.parser.Evaluator;
-import net.saga.diy.lisp.parser.operation.Operation;
-import net.saga.diy.lisp.parser.types.Environment;
-import net.saga.diy.lisp.parser.types.LispException;
+import net.saga.diy.lisp.Evaluator;
+import net.saga.diy.lisp.evaluator.operation.Operation;
+import net.saga.diy.lisp.types.Environment;
+import net.saga.diy.lisp.types.LispException;
 
 public class MathOperation implements Operation<Operation> {
 

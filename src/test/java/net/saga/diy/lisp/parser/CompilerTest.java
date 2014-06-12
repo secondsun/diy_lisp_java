@@ -18,11 +18,12 @@
  */
 package net.saga.diy.lisp.parser;
 
+import net.saga.diy.lisp.Compiler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import static net.saga.diy.lisp.parser.EvaluatorTest.run;
-import static net.saga.diy.lisp.parser.Parser.parse;
-import net.saga.diy.lisp.parser.types.LispException;
+import static net.saga.diy.lisp.Parser.parse;
+import net.saga.diy.lisp.types.LispException;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

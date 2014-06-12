@@ -16,24 +16,10 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation;
+package net.saga.diy.lisp;
 
-import net.saga.diy.lisp.parser.Evaluator;
-import net.saga.diy.lisp.parser.types.Environment;
-import net.saga.diy.lisp.parser.types.LispException;
-
-public class DefineOperation implements Operation<Operation> {
-
-    @Override
-    public Operation<Void> operate(Object name, Environment env) {
-        
-        if (!(name instanceof String)) {
-            throw new LispException("Illegal define name token");
-        }
-        
-        return ((value, env2) ->{
-            env2.set((String) name, Evaluator.evaluate(value, env2));
-            return null;
-        });
+public class Program {
+    public Object run(){
+                throw new UnsupportedOperationException("Not supported yet.");
     }
 }

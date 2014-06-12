@@ -16,7 +16,7 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser;
+package net.saga.diy.lisp;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.saga.diy.lisp.parser.types.LispException;
+import net.saga.diy.lisp.types.LispException;
 
 public class Parser {
 

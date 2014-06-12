@@ -16,7 +16,23 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.types;
+package net.saga.diy.lisp.evaluator.operation;
 
-public interface Quote {
+import net.saga.diy.lisp.Evaluator;
+import net.saga.diy.lisp.types.Environment;
+
+public class IfOperation implements Operation<Object>{
+
+    private final Operation evaluateForFalse = (token1,env1) -> {return (Operation)(token2,env2) -> Evaluator.evaluate(token2, env2);};
+    private final Operation evaluateForTrue = (token1,env1) -> {return (Operation)(token2,env2) -> Evaluator.evaluate(token1, env1);};
+    
+    @Override
+    public Object operate(Object token, Environment env) {
+        if ((boolean)Evaluator.evaluate(token, env)) {
+            return evaluateForTrue;
+        } else {
+            return evaluateForFalse;
+        }
+    }
+    
 }

@@ -16,37 +16,41 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation;
+package net.saga.diy.lisp.evaluator.operation;
 
-import static net.saga.diy.lisp.parser.Evaluator.evaluate;
-import net.saga.diy.lisp.parser.types.Environment;
-import net.saga.diy.lisp.parser.types.LispException;
-import static net.saga.diy.lisp.parser.types.Utils.isEmptyList;
-import static net.saga.diy.lisp.parser.types.Utils.isList;
+import java.util.Arrays;
+import static net.saga.diy.lisp.Evaluator.evaluate;
+import net.saga.diy.lisp.types.Environment;
+import net.saga.diy.lisp.types.LispException;
 
-public class HeadOperation implements Operation<Object> {
+/**
+ * 
+ * @author summers
+ */
+public class TailOperation implements Operation<Object[]> {
 
     @Override
-    public Object operate(Object listToken, Environment env) {
-        if (!isList(listToken)) {
+    public Object[] operate(Object listToken, Environment env) {
+
+        if (!listToken.getClass().isArray()) {
             throw new LispException(listToken + " is not a list");
-        } else if (isEmptyList(listToken)) {
+        }
+
+        Object[] listArr = (Object[]) listToken;
+
+        if (listArr.length == 0) {
             throw new LispException(listToken + " is empty");
         }
 
-        Object result = evaluate((Object[]) listToken, env);
+        Object result = evaluate(listArr, env);
 
-        if (isList(result)) {
+        if (result.getClass().isArray()) {
             Object[] ast = (Object[]) result;
-            if (isEmptyList(ast)) {
-                throw new LispException(listToken + " is empty");
+            if (ast.length == 0) {
+                throw new LispException(ast + " is empty");
             }
-            return evaluate(ast[0], env);
-        } else if (result.getClass().isArray()) {
-            return ((Object[]) result)[0];
+            return Arrays.copyOfRange(ast, 1, ast.length);
         }
-
-        throw new LispException(listToken + " is not a list");
+        throw new LispException(result + " is not a list");
     }
-
 }

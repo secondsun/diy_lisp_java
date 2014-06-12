@@ -16,25 +16,16 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation;
+package net.saga.diy.lisp.evaluator.operation;
 
-import net.saga.diy.lisp.parser.Evaluator;
-import net.saga.diy.lisp.parser.types.Environment;
-import net.saga.diy.lisp.parser.types.LispException;
-import net.saga.diy.lisp.parser.types.Utils;
-import static net.saga.diy.lisp.parser.types.Utils.isList;
+import net.saga.diy.lisp.types.Environment;
 
-public class EmptyOperation implements Operation<Boolean> {
+/**
+ * 
+ * @author summers
+ */
+public interface Operation<T> {
 
-    @Override
-    public Boolean operate(Object listToken, Environment firstEnv) {
-        if (!isList(listToken)) {
-            throw new LispException(listToken + " is not a list");
-        }
-        Object res = Evaluator.evaluate((Object[]) listToken, firstEnv);
-
-        return Utils.isEmptyList(res);
-
-    }
+    public T operate(Object token, Environment env);
 
 }

@@ -16,12 +16,7 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.types;
+package net.saga.diy.lisp.types;
 
-public class LispException extends RuntimeException {
-
-    public LispException(String message) {
-        super(message);
-    }
-
+public interface Quote {
 }

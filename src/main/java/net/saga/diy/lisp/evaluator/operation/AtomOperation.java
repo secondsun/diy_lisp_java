@@ -16,16 +16,36 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation;
+package net.saga.diy.lisp.evaluator.operation;
 
-import net.saga.diy.lisp.parser.types.Environment;
+import net.saga.diy.lisp.SpecialTokens;
+import net.saga.diy.lisp.types.Environment;
 
 /**
  * 
  * @author summers
  */
-public interface Operation<T> {
+public class AtomOperation implements Operation<Boolean> {
 
-    public T operate(Object token, Environment env);
+    public AtomOperation() {
+    }
+
+    /*
+     * I made a mistake in how I parse "'" and it creates a new AST. It makes
+     * some operations easier, but atoms now have to make sure a list isn't being
+     * quoted.
+     */
+    @Override
+    public Boolean operate(Object token, Environment env) {
+        if (!token.getClass().isArray()) {
+            return true;
+        }
+
+        Object[] tokenArr = (Object[]) token;
+
+        return SpecialTokens.QUOTE.equals(tokenArr[0]) &&
+                tokenArr.length == 2 &&
+                !tokenArr[1].getClass().isArray();
+    }
 
 }

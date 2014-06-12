@@ -16,14 +16,14 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation;
+package net.saga.diy.lisp.evaluator.operation;
 
 import java.util.List;
-import net.saga.diy.lisp.parser.Evaluator;
-import net.saga.diy.lisp.parser.SpecialTokens;
-import net.saga.diy.lisp.parser.types.Environment;
-import net.saga.diy.lisp.parser.types.LispException;
-import static net.saga.diy.lisp.parser.types.Utils.isList;
+import net.saga.diy.lisp.Evaluator;
+import net.saga.diy.lisp.SpecialTokens;
+import net.saga.diy.lisp.types.Environment;
+import net.saga.diy.lisp.types.LispException;
+import static net.saga.diy.lisp.types.Utils.isList;
 
 public class ConsOperation implements Operation<Operation> {
 

@@ -16,38 +16,34 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation.math;
+package net.saga.diy.lisp.evaluator.operation;
 
-import java.util.HashMap;
-import java.util.Map;
-import net.saga.diy.lisp.parser.types.LispException;
+import net.saga.diy.lisp.Evaluator;
+import net.saga.diy.lisp.types.Closure;
+import net.saga.diy.lisp.types.Environment;
 
 /**
  * 
  * @author summers
  */
-public enum Operand {
+public class LookupOperation implements Operation {
 
-    ADD, SUB, DIV, MULT, MOD, GT, LT;
-
-    private static final Map<String, Operand> symbolMap = new HashMap<String, Operand>(6);
-
-    static {
-        symbolMap.put("+", ADD);
-        symbolMap.put("-", SUB);
-        symbolMap.put("/", DIV);
-        symbolMap.put("*", MULT);
-        symbolMap.put("mod", MOD);
-        symbolMap.put(">", GT);
-        symbolMap.put("<", LT);
+    public LookupOperation() {
     }
 
-    public static Operand fromSymbol(String symbol) {
-        if (!symbolMap.containsKey(symbol)) {
-            throw new LispException("Illegal symbol " + symbol);
+    @Override
+    public Object operate(Object token, Environment env) {
+        Object result = env.lookup((String) token);
+        if (result instanceof Closure) {
+            Closure closure = (Closure) result;
+            if (closure.getParams().length == 0) {
+                return Evaluator.evaluate(closure.getBody(), closure.getEnv());
+            } else {
+                return new ClosureOperation(closure);
+            }
+        } else {
+            return result;
         }
-        return symbolMap.get(symbol);
-
     }
 
 }

@@ -16,36 +16,41 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation;
+package net.saga.diy.lisp.types;
 
-import net.saga.diy.lisp.parser.SpecialTokens;
-import net.saga.diy.lisp.parser.types.Environment;
+import java.util.Map;
 
 /**
  * 
  * @author summers
  */
-public class AtomOperation implements Operation<Boolean> {
+public class Utils {
 
-    public AtomOperation() {
-    }
+    public static <K, V> V getOrThrow(Map<K, V> map, K key) {
 
-    /*
-     * I made a mistake in how I parse "'" and it creates a new AST. It makes
-     * some operations easier, but atoms now have to make sure a list isn't being
-     * quoted.
-     */
-    @Override
-    public Boolean operate(Object token, Environment env) {
-        if (!token.getClass().isArray()) {
-            return true;
+        V value = map.get(key);
+
+        if (value == null) {
+            throw new LispException("No value " + key);
         }
 
-        Object[] tokenArr = (Object[]) token;
+        return value;
+    }
 
-        return SpecialTokens.QUOTE.equals(tokenArr[0]) &&
-                tokenArr.length == 2 &&
-                !tokenArr[1].getClass().isArray();
+    public static boolean isList(Object token) {
+        try {
+            return token.getClass().isArray();
+        } catch (Exception ignore) {
+            throw new LispException("Illegal token:" + token);
+        }
+    }
+
+    public static boolean isEmptyList(Object token) {
+        try {
+            return ((Object[]) token).length == 0;
+        } catch (Exception ignore) {
+            throw new LispException("Illegal token:" + token);
+        }
     }
 
 }

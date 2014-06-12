@@ -16,22 +16,23 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser.operation;
+package net.saga.diy.lisp.evaluator.operation;
 
-import net.saga.diy.lisp.parser.types.Environment;
+import net.saga.diy.lisp.types.Environment;
 
 /**
  * 
  * @author summers
  */
-public class EqOperation implements Operation<Eq2Operation> {
-
-    public EqOperation() {
-    }
+public class QuoteOperation implements Operation<Object> {
 
     @Override
-    public Eq2Operation operate(Object token, Environment env) {
-        return new Eq2Operation(token);
+    public Object operate(Object token, Environment env) {
+        if (token instanceof String) {
+            return token;
+        } else {
+            return token;
+        }
     }
 
 }
