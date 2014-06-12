@@ -18,6 +18,7 @@
  */
 package net.saga.diy.lisp.parser;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import static net.saga.diy.lisp.parser.Parser.parse;
 import org.junit.Assert;
@@ -61,13 +62,16 @@ public class CompilerTest {
      * If you execute the main method of the compiled class, it should return a
      * value.
      */
-    public void testCompileBoolean() {
+    public void testCompileBoolean() throws Exception {
         assertTrue((boolean) run("#t"));
         assertFalse((boolean) run("#f"));
     }
 
-    public static Object run(String program) {
-        throw new NotImplementedException();
+    public static Object run(String program) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        Class<?> klass = Compiler.compile(parse(program));
+        Object instance = klass.newInstance();
+        Method method = klass.getMethod("main", (Class[])null);
+        return method.invoke(instance, (Class[])null);
     }
 
 }

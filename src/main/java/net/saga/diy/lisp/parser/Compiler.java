@@ -18,7 +18,11 @@
  */
 package net.saga.diy.lisp.parser;
 
+import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.JiteClass;
+import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_PUBLIC;
+import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_STATIC;
+import me.qmx.jitescript.util.CodegenUtils;
 import static me.qmx.jitescript.util.CodegenUtils.c;
 
 /**
@@ -36,11 +40,28 @@ public class Compiler {
     }
 
     public static Class<?> compile(Object parse) {
-        return new DynamicClassLoader().define(new JiteClass("anonymous") {
+        JiteClass jiteClass = new JiteClass("anonymous") {
             {
                 defineDefaultConstructor();
+
             }
-        });
+        };
+
+        if (parse.getClass() == Boolean.class) {
+            if ((Boolean)parse) {
+                jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(boolean.class),
+                    newCodeBlock().iconst_1().ireturn());
+            } else {
+                jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(boolean.class),
+                    newCodeBlock().iconst_0().ireturn());
+            }
+            
+        } else {
+            jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                    newCodeBlock().aconst_null().areturn());
+        }
+
+        return new DynamicClassLoader().define(jiteClass);
     }
 
 }
