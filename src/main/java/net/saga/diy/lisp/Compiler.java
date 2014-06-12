@@ -18,12 +18,17 @@
  */
 package net.saga.diy.lisp;
 
+import java.io.FileOutputStream;
+import me.qmx.jitescript.CodeBlock;
 import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.JiteClass;
 import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_STATIC;
 import me.qmx.jitescript.util.CodegenUtils;
 import static me.qmx.jitescript.util.CodegenUtils.c;
+import static net.saga.diy.lisp.SpecialTokens.QUOTE;
+import net.saga.diy.lisp.compiler.operation.Operation;
+import net.saga.diy.lisp.compiler.operation.QuoteOperation;
 
 /**
  *
@@ -43,7 +48,6 @@ public class Compiler {
         JiteClass jiteClass = new JiteClass("anonymous") {
             {
                 defineDefaultConstructor();
-
             }
         };
 
@@ -57,16 +61,55 @@ public class Compiler {
             }
 
         } else if (parse.getClass() == Integer.class) {
-            
+
             jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(int.class),
                     newCodeBlock().ldc((int) parse).ireturn());
+
+        } else if (parse.getClass().isArray()) {
+            Object[] ast = (Object[]) parse;
+            Operation operation = null;
+            int length = ast.length;
+            
+            if (length == 0) {
+                jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                    newCodeBlock().aconst_null().areturn());
+            }
+            
+            for (int pointer = 0; pointer < length; pointer++) {
+                Object token = ast[pointer];
+
+                if (token.getClass() == String.class) {
+                    if (QUOTE.equals(token)) {
+                        operation = new QuoteOperation();
+                    } else {
+                        throw new RuntimeException("Not implemented");
+                    }
+
+                    CodeBlock block = operation.compile(ast[++pointer], newCodeBlock());
+
+                    jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                            block);
+
+                } else {
+                    throw new RuntimeException("Not implemented");
+                }
+            }
 
         } else {
             jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
                     newCodeBlock().aconst_null().areturn());
         }
-
-        return new DynamicClassLoader().define(jiteClass);
+        
+        Class<?> compiledClass = new DynamicClassLoader().define(jiteClass);
+        
+        try (FileOutputStream fos = new FileOutputStream("/tmp/anonymous.class")) {
+            fos.write(jiteClass.toBytes());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        
+        return compiledClass;
     }
 
 }
