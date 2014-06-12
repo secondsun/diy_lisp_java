@@ -85,7 +85,7 @@ public class CompilerTest {
      */
     @Test
     public void compileQuote() {
-//        assertEquals("foo", run("( quote foo)"));
+        assertEquals("foo", run("( quote foo)"));
         Assert.assertArrayEquals(new Object[] { 1, 2, false }, (Object[]) run("(quote (1 2 #f))"));
     }
 
