@@ -48,14 +48,19 @@ public class Compiler {
         };
 
         if (parse.getClass() == Boolean.class) {
-            if ((Boolean)parse) {
+            if ((Boolean) parse) {
                 jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(boolean.class),
-                    newCodeBlock().iconst_1().ireturn());
+                        newCodeBlock().iconst_1().ireturn());
             } else {
                 jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(boolean.class),
-                    newCodeBlock().iconst_0().ireturn());
+                        newCodeBlock().iconst_0().ireturn());
             }
+
+        } else if (parse.getClass() == Integer.class) {
             
+            jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(int.class),
+                    newCodeBlock().ldc((int) parse).ireturn());
+
         } else {
             jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
                     newCodeBlock().aconst_null().areturn());
