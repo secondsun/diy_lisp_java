@@ -26,7 +26,9 @@ import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_STATIC;
 import me.qmx.jitescript.util.CodegenUtils;
 import static me.qmx.jitescript.util.CodegenUtils.c;
+import static net.saga.diy.lisp.SpecialTokens.ATOM;
 import static net.saga.diy.lisp.SpecialTokens.QUOTE;
+import net.saga.diy.lisp.compiler.operation.AtomOperation;
 import net.saga.diy.lisp.compiler.operation.Operation;
 import net.saga.diy.lisp.compiler.operation.QuoteOperation;
 
@@ -81,6 +83,8 @@ public class Compiler {
                 if (token.getClass() == String.class) {
                     if (QUOTE.equals(token)) {
                         operation = new QuoteOperation();
+                    } else if (ATOM.equals(token)) {
+                        operation = new AtomOperation();
                     } else {
                         throw new RuntimeException("Not implemented");
                     }
