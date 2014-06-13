@@ -16,7 +16,7 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser;
+package net.saga.diy.lisp.evaluator;
 
 import net.saga.diy.lisp.Evaluator;
 import static net.saga.diy.lisp.Parser.parse;

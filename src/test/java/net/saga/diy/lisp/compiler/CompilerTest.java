@@ -16,13 +16,13 @@
  * This project is based on, borrows heavily from, and copies the documentation
  * of https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser;
+package net.saga.diy.lisp.compiler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import net.saga.diy.lisp.LispCompiler;
 import static net.saga.diy.lisp.Parser.parse;
-import static net.saga.diy.lisp.parser.EvaluatorTest.run;
+import static net.saga.diy.lisp.evaluator.EvaluatorTest.run;
 import net.saga.diy.lisp.types.LispException;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;

@@ -16,7 +16,7 @@
  * This project is based on, borrows heavily from, and copies the documentation of
  * https://github.com/kvalle/diy-lisp/
  */
-package net.saga.diy.lisp.parser;
+package net.saga.diy.lisp.evaluator;
 
 import org.junit.Assert;
 import org.junit.Test;
