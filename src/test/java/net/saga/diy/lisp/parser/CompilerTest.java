@@ -108,10 +108,10 @@ public class CompilerTest {
     @Test
     public void compileEq() {
         assertTrue((boolean) run("(eq 1 1)"));
-//        assertFalse((boolean) run("(eq 1 2)"));
-//        assertTrue((boolean) run("(eq 'foo 'foo)"));
-//        assertFalse((boolean) run("(eq 'foo 'bar)"));
-//        assertFalse((boolean) run("(eq '(1 2 3) '(1 2 3))"));
+        assertFalse((boolean) run("(eq 1 2)"));
+        assertTrue((boolean) run("(eq 'foo 'foo)"));
+        assertFalse((boolean) run("(eq 'foo 'bar)"));
+        assertFalse((boolean) run("(eq '(1 2 3) '(1 2 3))"));
     }
 
     /*
