@@ -18,16 +18,20 @@
  */
 package net.saga.diy.lisp.parser;
 
-import net.saga.diy.lisp.LispCompiler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import static net.saga.diy.lisp.parser.EvaluatorTest.run;
+import net.saga.diy.lisp.LispCompiler;
 import static net.saga.diy.lisp.Parser.parse;
+import static net.saga.diy.lisp.parser.EvaluatorTest.run;
 import net.saga.diy.lisp.types.LispException;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -86,7 +90,7 @@ public class CompilerTest {
     @Test
     public void compileQuote() {
         assertEquals("foo", run("( quote foo)"));
-        Assert.assertArrayEquals(new Object[] { 1, 2, false }, (Object[]) run("(quote (1 2 #f))"));
+        Assert.assertArrayEquals(new Object[]{1, 2, false}, (Object[]) run("(quote (1 2 #f))"));
     }
 
     /*
@@ -142,17 +146,24 @@ public class CompilerTest {
     }
 
     /* The math functions should only allow numbers as arguments. */
-    @Test(expected = LispException.class)
+    @Test()
     public void mathOnlyUsesInteger() {
-        assertEquals(false, run("> 7 'foo"));
+        try {
+            run("(> 7 'foo)");
+        } catch (RuntimeException ex) {
+            //You will have to fiddle with this depending on your implementation most likely
+            assertTrue(ex.getCause().getCause() instanceof ClassCastException);
+            return;
+        }
+        fail();
     }
 
-    public static Object run(String program){
+    public static Object run(String program) {
         try {
-        Class<?> klass = LispCompiler.compile(parse(program));
-        Object instance = klass.newInstance();
-        Method method = klass.getMethod("main", (Class[])null);
-        return method.invoke(instance, (Object[])null);
+            Class<?> klass = LispCompiler.compile(parse(program));
+            Object instance = klass.newInstance();
+            Method method = klass.getMethod("main", (Class[]) null);
+            return method.invoke(instance, (Object[]) null);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
             System.err.println(e);
             e.printStackTrace(System.err);

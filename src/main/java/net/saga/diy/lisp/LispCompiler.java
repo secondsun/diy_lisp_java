@@ -33,6 +33,7 @@ import static net.saga.diy.lisp.SpecialTokens.EQ;
 import static net.saga.diy.lisp.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.compiler.operation.AtomOperation;
 import net.saga.diy.lisp.compiler.operation.EqOperation;
+import net.saga.diy.lisp.compiler.operation.MathOperation;
 import net.saga.diy.lisp.compiler.operation.Operation;
 import net.saga.diy.lisp.compiler.operation.QuoteOperation;
 import net.saga.diy.lisp.types.LispException;
@@ -47,6 +48,13 @@ public class LispCompiler {
 
         public Class<?> define(JiteClass jiteClass) {
             byte[] classBytes = jiteClass.toBytes();
+
+            try (FileOutputStream fos = new FileOutputStream("/tmp/anonymous.class")) {
+                fos.write(classBytes);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
             return super.defineClass(c(jiteClass.getClassName()), classBytes, 0, classBytes.length);
         }
     }
@@ -60,17 +68,10 @@ public class LispCompiler {
         JiteClass klass = compile(parse, jiteClass, "main");
         Class<?> compiledClass = new DynamicClassLoader().define(klass);
 
-        try (FileOutputStream fos = new FileOutputStream("/tmp/anonymous.class")) {
-            fos.write(klass.toBytes());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
         return compiledClass;
     }
 
     public static JiteClass compile(Object parse, JiteClass parentClass, String methodName) {
-
 
         if (parse.getClass() == Boolean.class) {
             if ((Boolean) parse) {
@@ -84,7 +85,7 @@ public class LispCompiler {
         } else if (parse.getClass() == Integer.class) {
 
             parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
-                    newCodeBlock().ldc((int)parse).invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class)).areturn());
+                    newCodeBlock().ldc((int) parse).invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class)).areturn());
 
         } else if (parse.getClass().isArray()) {
             Object[] ast = (Object[]) parse;
@@ -106,6 +107,8 @@ public class LispCompiler {
                         operation = new AtomOperation();
                     } else if (EQ.equals(token)) {
                         operation = new EqOperation();
+                    } else if (SpecialTokens.MATHS.contains(token)) {
+                        operation = new MathOperation(token);
                     } else {
                         throw new RuntimeException("Not implemented");
                     }
