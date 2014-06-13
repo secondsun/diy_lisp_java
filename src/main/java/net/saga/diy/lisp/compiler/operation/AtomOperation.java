@@ -19,6 +19,8 @@
 package net.saga.diy.lisp.compiler.operation;
 
 import me.qmx.jitescript.CodeBlock;
+import static me.qmx.jitescript.CodeBlock.newCodeBlock;
+import me.qmx.jitescript.JiteClass;
 import static me.qmx.jitescript.util.CodegenUtils.p;
 import static me.qmx.jitescript.util.CodegenUtils.sig;
 import net.saga.diy.lisp.SpecialTokens;
@@ -27,10 +29,13 @@ import net.saga.diy.lisp.SpecialTokens;
  *
  * @author summers
  */
-public class AtomOperation implements Operation {
+public class AtomOperation implements Operation<CodeBlock> {
 
     @Override
-    public CodeBlock compile(Object token, CodeBlock codeBlock) {
+    public CodeBlock compile(Object token, JiteClass jiteClass) {
+        
+        CodeBlock codeBlock = newCodeBlock();
+        
         if (!token.getClass().isArray()) {
             return codeBlock.ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn();
         }

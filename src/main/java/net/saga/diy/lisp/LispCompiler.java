@@ -26,17 +26,22 @@ import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_STATIC;
 import me.qmx.jitescript.util.CodegenUtils;
 import static me.qmx.jitescript.util.CodegenUtils.c;
+import static me.qmx.jitescript.util.CodegenUtils.p;
+import static me.qmx.jitescript.util.CodegenUtils.sig;
 import static net.saga.diy.lisp.SpecialTokens.ATOM;
+import static net.saga.diy.lisp.SpecialTokens.EQ;
 import static net.saga.diy.lisp.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.compiler.operation.AtomOperation;
+import net.saga.diy.lisp.compiler.operation.EqOperation;
 import net.saga.diy.lisp.compiler.operation.Operation;
 import net.saga.diy.lisp.compiler.operation.QuoteOperation;
+import net.saga.diy.lisp.types.LispException;
 
 /**
  *
  * @author summers
  */
-public class Compiler {
+public class LispCompiler {
 
     private static class DynamicClassLoader extends ClassLoader {
 
@@ -52,31 +57,45 @@ public class Compiler {
                 defineDefaultConstructor();
             }
         };
+        JiteClass klass = compile(parse, jiteClass, "main");
+        Class<?> compiledClass = new DynamicClassLoader().define(klass);
+
+        try (FileOutputStream fos = new FileOutputStream("/tmp/anonymous.class")) {
+            fos.write(klass.toBytes());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return compiledClass;
+    }
+
+    public static JiteClass compile(Object parse, JiteClass parentClass, String methodName) {
+
 
         if (parse.getClass() == Boolean.class) {
             if ((Boolean) parse) {
-                jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(boolean.class),
-                        newCodeBlock().iconst_1().ireturn());
+                parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                        newCodeBlock().ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn());
             } else {
-                jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(boolean.class),
-                        newCodeBlock().iconst_0().ireturn());
+                parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                        newCodeBlock().ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn());
             }
 
         } else if (parse.getClass() == Integer.class) {
 
-            jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(int.class),
-                    newCodeBlock().ldc((int) parse).ireturn());
+            parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                    newCodeBlock().ldc((int)parse).invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class)).areturn());
 
         } else if (parse.getClass().isArray()) {
             Object[] ast = (Object[]) parse;
             Operation operation = null;
             int length = ast.length;
-            
+
             if (length == 0) {
-                jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
-                    newCodeBlock().aconst_null().areturn());
+                parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                        newCodeBlock().aconst_null().areturn());
             }
-            
+
             for (int pointer = 0; pointer < length; pointer++) {
                 Object token = ast[pointer];
 
@@ -85,14 +104,21 @@ public class Compiler {
                         operation = new QuoteOperation();
                     } else if (ATOM.equals(token)) {
                         operation = new AtomOperation();
+                    } else if (EQ.equals(token)) {
+                        operation = new EqOperation();
                     } else {
                         throw new RuntimeException("Not implemented");
                     }
 
-                    CodeBlock block = operation.compile(ast[++pointer], newCodeBlock());
+                    Object res = operation.compile(ast[++pointer], parentClass);
 
-                    jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
-                            block);
+                    while (res instanceof Operation) {
+                        if ((pointer + 1) >= ast.length) {
+                            throw new LispException("Missing token");
+                        }
+                        res = ((Operation) res).compile(ast[++pointer], parentClass);
+                    }
+                    parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class), (CodeBlock) res);
 
                 } else {
                     throw new RuntimeException("Not implemented");
@@ -100,20 +126,11 @@ public class Compiler {
             }
 
         } else {
-            jiteClass.defineMethod("main", ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+            parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
                     newCodeBlock().aconst_null().areturn());
         }
-        
-        Class<?> compiledClass = new DynamicClassLoader().define(jiteClass);
-        
-        try (FileOutputStream fos = new FileOutputStream("/tmp/anonymous.class")) {
-            fos.write(jiteClass.toBytes());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        
-        
-        return compiledClass;
+
+        return parentClass;
     }
 
 }

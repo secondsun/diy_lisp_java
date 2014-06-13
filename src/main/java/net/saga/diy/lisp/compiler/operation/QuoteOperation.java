@@ -19,6 +19,8 @@
 package net.saga.diy.lisp.compiler.operation;
 
 import me.qmx.jitescript.CodeBlock;
+import static me.qmx.jitescript.CodeBlock.newCodeBlock;
+import me.qmx.jitescript.JiteClass;
 import static me.qmx.jitescript.util.CodegenUtils.p;
 import static me.qmx.jitescript.util.CodegenUtils.sig;
 
@@ -26,10 +28,12 @@ import static me.qmx.jitescript.util.CodegenUtils.sig;
  *
  * @author summers
  */
-public class QuoteOperation implements Operation {
+public class QuoteOperation implements Operation<CodeBlock> {
 
     @Override
-    public CodeBlock compile(Object token, CodeBlock codeBlock) {
+    public CodeBlock compile(Object token, JiteClass jiteClass) {
+        CodeBlock codeBlock = newCodeBlock();
+        
         if (token.getClass().isArray()) {
             Object[] array = (Object[]) token;
             int length = array.length;

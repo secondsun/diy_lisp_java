@@ -19,13 +19,14 @@
 package net.saga.diy.lisp.compiler.operation;
 
 import me.qmx.jitescript.CodeBlock;
+import me.qmx.jitescript.JiteClass;
 
 /**
  * 
  * @author summers
  */
-public interface Operation {
+public interface Operation<T> {
 
-    public CodeBlock compile(Object token, CodeBlock codeBlock);
+    public T compile(Object token, JiteClass jiteClass);
 
 }
