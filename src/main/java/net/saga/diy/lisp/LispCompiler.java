@@ -30,9 +30,11 @@ import static me.qmx.jitescript.util.CodegenUtils.p;
 import static me.qmx.jitescript.util.CodegenUtils.sig;
 import static net.saga.diy.lisp.SpecialTokens.ATOM;
 import static net.saga.diy.lisp.SpecialTokens.EQ;
+import static net.saga.diy.lisp.SpecialTokens.IF;
 import static net.saga.diy.lisp.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.compiler.operation.AtomOperation;
 import net.saga.diy.lisp.compiler.operation.EqOperation;
+import net.saga.diy.lisp.compiler.operation.IfOperation;
 import net.saga.diy.lisp.compiler.operation.MathOperation;
 import net.saga.diy.lisp.compiler.operation.Operation;
 import net.saga.diy.lisp.compiler.operation.QuoteOperation;
@@ -107,6 +109,8 @@ public class LispCompiler {
                         operation = new AtomOperation();
                     } else if (EQ.equals(token)) {
                         operation = new EqOperation();
+                    } else if (IF.equals(token)) {
+                        operation = new IfOperation();
                     } else if (SpecialTokens.MATHS.contains(token)) {
                         operation = new MathOperation(token);
                     } else {
