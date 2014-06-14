@@ -53,10 +53,10 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     CodeBlock addCodeBlock = newCodeBlock();
 
                     addCodeBlock
-                            .invokestatic(env.getClassName(), firstMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
                             .checkcast(p(Integer.class))
                             .invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .invokestatic(env.getClassName(), secondMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class))
                             .invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .iadd()
@@ -71,10 +71,10 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     CodeBlock subCodeBlock = newCodeBlock();
 
                     subCodeBlock
-                            .invokestatic(env.getClassName(), firstMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
                             .checkcast(p(Integer.class))
                             .invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .invokestatic(env.getClassName(), secondMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class))
                             .invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .isub()
@@ -88,9 +88,9 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     CodeBlock divCodeBlock = newCodeBlock();
 
                     divCodeBlock
-                            .invokestatic(env.getClassName(), firstMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .invokestatic(env.getClassName(), secondMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .idiv()
                             .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class))
@@ -103,9 +103,9 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     CodeBlock modCodeBlock = newCodeBlock();
 
                     modCodeBlock
-                            .invokestatic(env.getClassName(), firstMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .invokestatic(env.getClassName(), secondMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .irem()
                             .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class))
@@ -119,9 +119,9 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     CodeBlock gtCodeBlock = newCodeBlock();
 
                     gtCodeBlock
-                            .invokestatic(env.getClassName(), firstMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .invokestatic(env.getClassName(), secondMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .if_icmpgt(isGreater)
                             .ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn()
@@ -136,9 +136,9 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     CodeBlock ltCodeBlock = newCodeBlock();
 
                     ltCodeBlock
-                            .invokestatic(env.getClassName(), firstMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .invokestatic(env.getClassName(), secondMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .if_icmplt(isLesser)
                             .ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn()
@@ -152,9 +152,9 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     CodeBlock multCodeBlock = newCodeBlock();
 
                     multCodeBlock
-                            .invokestatic(env.getClassName(), firstMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .invokestatic(env.getClassName(), secondMethodName, sig(Object.class))
+                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .imul()
                             .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class))

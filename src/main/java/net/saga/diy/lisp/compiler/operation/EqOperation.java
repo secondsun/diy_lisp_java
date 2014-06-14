@@ -26,33 +26,16 @@ public class EqOperation implements Operation<Operation> {
             
             LispCompiler.compile(firstToken, jiteClass, firstMethodName);
             LispCompiler.compile(secondToken, jiteClass, secondMethodName);
-            
-            codeBlock.invokestatic(jiteClass.getClassName(), firstMethodName, sig(Object.class));
-            codeBlock.invokestatic(jiteClass.getClassName(), secondMethodName, sig(Object.class));
+            codeBlock.aload(0);
+            codeBlock.invokevirtual(jiteClass.getClassName(), firstMethodName, sig(Object.class));
+            codeBlock.aload(0);
+            codeBlock.invokevirtual(jiteClass.getClassName(), secondMethodName, sig(Object.class));
 
             codeBlock.invokevirtual(p(Object.class), "equals", sig(boolean.class, Object.class));
             codeBlock.invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
             codeBlock.areturn();
             return codeBlock;
 
-            /*
-
-             Object firstValue;
-             Object secondValue;
-
-             firstValue = (Evaluator.evaluate(firstToken, env));
-
-             secondValue = (Evaluator.evaluate(secondToken, env));
-
-             if (isList(firstValue)) {
-             return false;
-             }
-
-             if (isList(secondValue)) {
-             return false;
-             }
-
-             return firstValue.equals(secondValue);*/
         };
     }
 

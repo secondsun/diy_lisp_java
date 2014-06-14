@@ -77,16 +77,16 @@ public class LispCompiler {
 
         if (parse.getClass() == Boolean.class) {
             if ((Boolean) parse) {
-                parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
                         newCodeBlock().ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn());
             } else {
-                parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
                         newCodeBlock().ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn());
             }
 
         } else if (parse.getClass() == Integer.class) {
 
-            parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+            parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
                     newCodeBlock().ldc((int) parse).invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class)).areturn());
 
         } else if (parse.getClass().isArray()) {
@@ -95,7 +95,7 @@ public class LispCompiler {
             int length = ast.length;
 
             if (length == 0) {
-                parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+                parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
                         newCodeBlock().aconst_null().areturn());
             }
 
@@ -125,7 +125,7 @@ public class LispCompiler {
                         }
                         res = ((Operation) res).compile(ast[++pointer], parentClass);
                     }
-                    parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class), (CodeBlock) res);
+                    parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class), (CodeBlock) res);
 
                 } else {
                     throw new RuntimeException("Not implemented");
@@ -133,7 +133,7 @@ public class LispCompiler {
             }
 
         } else {
-            parentClass.defineMethod(methodName, ACC_PUBLIC | ACC_STATIC, CodegenUtils.sig(Object.class),
+            parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
                     newCodeBlock().aconst_null().areturn());
         }
 

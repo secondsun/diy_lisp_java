@@ -47,15 +47,17 @@ public class IfOperation implements Operation<Operation<Operation<CodeBlock>>> {
                 LispCompiler.compile(falseToken, jiteClass, falseMethod);
                 
                 CodeBlock codeBlock = newCodeBlock();
-                
-                codeBlock.invokestatic(jiteClass.getClassName(), evaluateIfMethod, CodegenUtils.sig(Object.class));
+                codeBlock.aload(0);
+                codeBlock.invokevirtual(jiteClass.getClassName(), evaluateIfMethod, CodegenUtils.sig(Object.class));
                 codeBlock.checkcast(p(Boolean.class));
                 codeBlock.invokevirtual(p(Boolean.class), "booleanValue", CodegenUtils.sig(boolean.class));
                 codeBlock.iftrue(trueNode);
                 codeBlock.label(falseNode);
-                codeBlock.invokestatic(jiteClass.getClassName(), falseMethod, CodegenUtils.sig(Object.class)).areturn();
+                codeBlock.aload(0);
+                codeBlock.invokevirtual(jiteClass.getClassName(), falseMethod, CodegenUtils.sig(Object.class)).areturn();
                 codeBlock.label(trueNode);
-                codeBlock.invokestatic(jiteClass.getClassName(), trueMethod, CodegenUtils.sig(Object.class)).areturn();
+                codeBlock.aload(0);
+                codeBlock.invokevirtual(jiteClass.getClassName(), trueMethod, CodegenUtils.sig(Object.class)).areturn();
                 
                 return codeBlock;
             });
