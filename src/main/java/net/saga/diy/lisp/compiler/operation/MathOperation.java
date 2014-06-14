@@ -27,6 +27,7 @@ import static me.qmx.jitescript.util.CodegenUtils.p;
 import static me.qmx.jitescript.util.CodegenUtils.sig;
 import net.saga.diy.lisp.LispCompiler;
 import net.saga.diy.lisp.evaluator.operation.Operand;
+import net.saga.diy.lisp.types.CompilerContext;
 import net.saga.diy.lisp.types.LispException;
 
 /**
@@ -42,14 +43,14 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
     }
 
     @Override
-    public Operation<CodeBlock> compile(Object token, JiteClass env) {
-
-        final String firstMethodName = verifyAndCompile(token, env);
+    public Operation<CodeBlock> compile(Object token, CompilerContext compilerContext) {
+        JiteClass env = compilerContext.jiteClass;
+        final String firstMethodName = verifyAndCompile(token, compilerContext);
 
         switch (op) {
             case ADD:
-                return ((nextToken, env2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, env2);
+                return ((nextToken, context2) -> {
+                    String secondMethodName = verifyAndCompile(nextToken, context2);
                     CodeBlock addCodeBlock = newCodeBlock();
 
                     addCodeBlock
@@ -66,8 +67,8 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                 });
 
             case SUB:
-                return ((nextToken, env2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, env2);
+                return ((nextToken, context2) -> {
+                    String secondMethodName = verifyAndCompile(nextToken, context2);
                     CodeBlock subCodeBlock = newCodeBlock();
 
                     subCodeBlock
@@ -83,8 +84,8 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     return subCodeBlock;
                 });
             case DIV:
-                return ((nextToken, env2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, env2);
+                return ((nextToken, context2) -> {
+                    String secondMethodName = verifyAndCompile(nextToken, context2);
                     CodeBlock divCodeBlock = newCodeBlock();
 
                     divCodeBlock
@@ -98,8 +99,8 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     return divCodeBlock;
                 });
             case MOD:
-                return ((nextToken, env2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, env2);
+                return ((nextToken, context2) -> {
+                    String secondMethodName = verifyAndCompile(nextToken, context2);
                     CodeBlock modCodeBlock = newCodeBlock();
 
                     modCodeBlock
@@ -113,9 +114,9 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     return modCodeBlock;
                 });
             case GT:
-                return ((nextToken, env2) -> {
+                return ((nextToken, context2) -> {
                     LabelNode isGreater = new LabelNode();
-                    String secondMethodName = verifyAndCompile(nextToken, env2);
+                    String secondMethodName = verifyAndCompile(nextToken, context2);
                     CodeBlock gtCodeBlock = newCodeBlock();
 
                     gtCodeBlock
@@ -130,9 +131,9 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     return gtCodeBlock;
                 });
             case LT:
-                return ((nextToken, env2) -> {
+                return ((nextToken, context2) -> {
                     LabelNode isLesser = new LabelNode();
-                    String secondMethodName = verifyAndCompile(nextToken, env2);
+                    String secondMethodName = verifyAndCompile(nextToken, context2);
                     CodeBlock ltCodeBlock = newCodeBlock();
 
                     ltCodeBlock
@@ -147,8 +148,8 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
                     return ltCodeBlock;
                 });
             case MULT:
-                return ((nextToken, env2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, env2);
+                return ((nextToken, context2) -> {
+                    String secondMethodName = verifyAndCompile(nextToken, context2);
                     CodeBlock multCodeBlock = newCodeBlock();
 
                     multCodeBlock
@@ -176,7 +177,7 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
      * @param env
      * @return 
      */
-    private String verifyAndCompile(Object token, JiteClass env) {
+    private String verifyAndCompile(Object token, CompilerContext env) {
 
         String methodName = "operand" + UUID.randomUUID().toString();
 

@@ -38,6 +38,7 @@ import net.saga.diy.lisp.compiler.operation.IfOperation;
 import net.saga.diy.lisp.compiler.operation.MathOperation;
 import net.saga.diy.lisp.compiler.operation.Operation;
 import net.saga.diy.lisp.compiler.operation.QuoteOperation;
+import net.saga.diy.lisp.types.CompilerContext;
 import net.saga.diy.lisp.types.LispException;
 
 /**
@@ -62,19 +63,17 @@ public class LispCompiler {
     }
 
     public static Class<?> compile(Object parse) {
-        JiteClass jiteClass = new JiteClass("anonymous") {
-            {
-                defineDefaultConstructor();
-            }
-        };
-        JiteClass klass = compile(parse, jiteClass, "main");
+        CompilerContext context = new CompilerContext();
+        JiteClass klass = compile(parse, context, "main");
         Class<?> compiledClass = new DynamicClassLoader().define(klass);
 
         return compiledClass;
     }
 
-    public static JiteClass compile(Object parse, JiteClass parentClass, String methodName) {
+    public static JiteClass compile(Object parse, CompilerContext compilerContext, String methodName) {
 
+        JiteClass parentClass = compilerContext.jiteClass;
+        
         if (parse.getClass() == Boolean.class) {
             if ((Boolean) parse) {
                 parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
@@ -117,13 +116,13 @@ public class LispCompiler {
                         throw new RuntimeException("Not implemented");
                     }
 
-                    Object res = operation.compile(ast[++pointer], parentClass);
+                    Object res = operation.compile(ast[++pointer], compilerContext);
 
                     while (res instanceof Operation) {
                         if ((pointer + 1) >= ast.length) {
                             throw new LispException("Missing token");
                         }
-                        res = ((Operation) res).compile(ast[++pointer], parentClass);
+                        res = ((Operation) res).compile(ast[++pointer], compilerContext);
                     }
                     parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class), (CodeBlock) res);
 

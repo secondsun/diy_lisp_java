@@ -26,11 +26,12 @@ import me.qmx.jitescript.internal.org.objectweb.asm.tree.LabelNode;
 import me.qmx.jitescript.util.CodegenUtils;
 import static me.qmx.jitescript.util.CodegenUtils.p;
 import net.saga.diy.lisp.LispCompiler;
+import net.saga.diy.lisp.types.CompilerContext;
 
 public class IfOperation implements Operation<Operation<Operation<CodeBlock>>> {
 
     @Override
-    public Operation<Operation<CodeBlock>> compile(Object token, JiteClass jiteClass) {
+    public Operation<Operation<CodeBlock>> compile(Object token, CompilerContext context) {
 
         return ((trueToken, trueClass) -> {
             return ((falseToken, falseClass) -> {
@@ -38,26 +39,26 @@ public class IfOperation implements Operation<Operation<Operation<CodeBlock>>> {
                 LabelNode falseNode = new LabelNode();
 
                 String evaluateIfMethod = "if_" + UUID.randomUUID().toString();
-                LispCompiler.compile(token, jiteClass, evaluateIfMethod);
+                LispCompiler.compile(token, context, evaluateIfMethod);
 
                 String trueMethod = "true_" + UUID.randomUUID().toString();
-                LispCompiler.compile(trueToken, jiteClass, trueMethod);
+                LispCompiler.compile(trueToken, trueClass, trueMethod);
 
                 String falseMethod = "false_" + UUID.randomUUID().toString();
-                LispCompiler.compile(falseToken, jiteClass, falseMethod);
+                LispCompiler.compile(falseToken, falseClass, falseMethod);
                 
                 CodeBlock codeBlock = newCodeBlock();
                 codeBlock.aload(0);
-                codeBlock.invokevirtual(jiteClass.getClassName(), evaluateIfMethod, CodegenUtils.sig(Object.class));
+                codeBlock.invokevirtual(context.getClassName(), evaluateIfMethod, CodegenUtils.sig(Object.class));
                 codeBlock.checkcast(p(Boolean.class));
                 codeBlock.invokevirtual(p(Boolean.class), "booleanValue", CodegenUtils.sig(boolean.class));
                 codeBlock.iftrue(trueNode);
                 codeBlock.label(falseNode);
                 codeBlock.aload(0);
-                codeBlock.invokevirtual(jiteClass.getClassName(), falseMethod, CodegenUtils.sig(Object.class)).areturn();
+                codeBlock.invokevirtual(context.getClassName(), falseMethod, CodegenUtils.sig(Object.class)).areturn();
                 codeBlock.label(trueNode);
                 codeBlock.aload(0);
-                codeBlock.invokevirtual(jiteClass.getClassName(), trueMethod, CodegenUtils.sig(Object.class)).areturn();
+                codeBlock.invokevirtual(context.getClassName(), trueMethod, CodegenUtils.sig(Object.class)).areturn();
                 
                 return codeBlock;
             });

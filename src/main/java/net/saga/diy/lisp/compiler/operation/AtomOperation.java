@@ -24,6 +24,7 @@ import me.qmx.jitescript.JiteClass;
 import static me.qmx.jitescript.util.CodegenUtils.p;
 import static me.qmx.jitescript.util.CodegenUtils.sig;
 import net.saga.diy.lisp.SpecialTokens;
+import net.saga.diy.lisp.types.CompilerContext;
 
 /**
  *
@@ -32,7 +33,7 @@ import net.saga.diy.lisp.SpecialTokens;
 public class AtomOperation implements Operation<CodeBlock> {
 
     @Override
-    public CodeBlock compile(Object token, JiteClass jiteClass) {
+    public CodeBlock compile(Object token, CompilerContext context) {
         
         CodeBlock codeBlock = newCodeBlock();
         

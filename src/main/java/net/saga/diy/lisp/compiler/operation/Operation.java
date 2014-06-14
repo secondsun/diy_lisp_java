@@ -18,8 +18,7 @@
  */
 package net.saga.diy.lisp.compiler.operation;
 
-import me.qmx.jitescript.CodeBlock;
-import me.qmx.jitescript.JiteClass;
+import net.saga.diy.lisp.types.CompilerContext;
 
 /**
  * 
@@ -27,6 +26,6 @@ import me.qmx.jitescript.JiteClass;
  */
 public interface Operation<T> {
 
-    public T compile(Object token, JiteClass jiteClass);
+    public T compile(Object token, CompilerContext compilerContext);
 
 }

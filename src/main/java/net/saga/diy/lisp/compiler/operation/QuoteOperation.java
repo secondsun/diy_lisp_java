@@ -23,6 +23,7 @@ import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.JiteClass;
 import static me.qmx.jitescript.util.CodegenUtils.p;
 import static me.qmx.jitescript.util.CodegenUtils.sig;
+import net.saga.diy.lisp.types.CompilerContext;
 
 /**
  *
@@ -31,7 +32,8 @@ import static me.qmx.jitescript.util.CodegenUtils.sig;
 public class QuoteOperation implements Operation<CodeBlock> {
 
     @Override
-    public CodeBlock compile(Object token, JiteClass jiteClass) {
+    public CodeBlock compile(Object token, CompilerContext compilerContext) {
+        
         CodeBlock codeBlock = newCodeBlock();
         
         if (token.getClass().isArray()) {
