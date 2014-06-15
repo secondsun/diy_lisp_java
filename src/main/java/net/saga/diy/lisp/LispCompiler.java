@@ -19,11 +19,11 @@
 package net.saga.diy.lisp;
 
 import java.io.FileOutputStream;
+import static javax.management.Query.value;
 import me.qmx.jitescript.CodeBlock;
 import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.JiteClass;
 import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_PUBLIC;
-import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_STATIC;
 import me.qmx.jitescript.util.CodegenUtils;
 import static me.qmx.jitescript.util.CodegenUtils.c;
 import static me.qmx.jitescript.util.CodegenUtils.p;
@@ -33,11 +33,13 @@ import static net.saga.diy.lisp.SpecialTokens.EQ;
 import static net.saga.diy.lisp.SpecialTokens.IF;
 import static net.saga.diy.lisp.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.compiler.operation.AtomOperation;
+import net.saga.diy.lisp.compiler.operation.DefineOperation;
 import net.saga.diy.lisp.compiler.operation.EqOperation;
 import net.saga.diy.lisp.compiler.operation.IfOperation;
 import net.saga.diy.lisp.compiler.operation.MathOperation;
 import net.saga.diy.lisp.compiler.operation.Operation;
 import net.saga.diy.lisp.compiler.operation.QuoteOperation;
+import net.saga.diy.lisp.compiler.operation.LookupOperation;
 import net.saga.diy.lisp.types.CompilerContext;
 import net.saga.diy.lisp.types.LispException;
 
@@ -64,38 +66,47 @@ public class LispCompiler {
 
     public static Class<?> compile(Object parse) {
         CompilerContext context = new CompilerContext();
-        JiteClass klass = compile(parse, context, "main");
+        JiteClass klass = compileMethod(parse, context, "main");
         Class<?> compiledClass = new DynamicClassLoader().define(klass);
 
         return compiledClass;
     }
 
-    public static JiteClass compile(Object parse, CompilerContext compilerContext, String methodName) {
+    public static JiteClass compileMethod(Object rootToken, CompilerContext compilerContext, String methodName) {
 
         JiteClass parentClass = compilerContext.jiteClass;
+
+        compileBlock(rootToken, compilerContext); //Compile expression
         
-        if (parse.getClass() == Boolean.class) {
-            if ((Boolean) parse) {
-                parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
-                        newCodeBlock().ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn());
+        compilerContext.currentBlock().areturn(); // return value of expression
+        
+        compilerContext.blockToMethod(methodName);
+
+        return parentClass;
+    }
+
+    
+    public static void compileBlock(Object rootToken, CompilerContext compilerContext) {
+        
+        if (rootToken.getClass() == Boolean.class) {
+            if ((Boolean) rootToken) {
+                compilerContext.currentBlock().ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
             } else {
-                parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
-                        newCodeBlock().ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn());
+                compilerContext.currentBlock().ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
             }
 
-        } else if (parse.getClass() == Integer.class) {
+        } else if (rootToken.getClass() == Integer.class) {
 
-            parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
-                    newCodeBlock().ldc((int) parse).invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class)).areturn());
+            compilerContext.currentBlock().ldc((int) rootToken).invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class));
+            
 
-        } else if (parse.getClass().isArray()) {
-            Object[] ast = (Object[]) parse;
+        } else if (rootToken.getClass().isArray()) {
+            Object[] ast = (Object[]) rootToken;
             Operation operation = null;
             int length = ast.length;
 
             if (length == 0) {
-                parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
-                        newCodeBlock().aconst_null().areturn());
+                compilerContext.currentBlock().aconst_null();
             }
 
             for (int pointer = 0; pointer < length; pointer++) {
@@ -110,10 +121,19 @@ public class LispCompiler {
                         operation = new EqOperation();
                     } else if (IF.equals(token)) {
                         operation = new IfOperation();
+                    } else if (SpecialTokens.DEFINE.equals(token)) {
+                        operation = new DefineOperation();
                     } else if (SpecialTokens.MATHS.contains(token)) {
                         operation = new MathOperation(token);
                     } else {
-                        throw new RuntimeException("Not implemented");
+                        operation = new LookupOperation();
+                        CodeBlock result = (CodeBlock) operation.compile(token, compilerContext);
+                        if (!(result instanceof net.saga.diy.lisp.evaluator.operation.Operation)) {
+                            throw new RuntimeException("This won't work because it will create tons of extra methods exception");
+
+                        } else {
+                            throw new RuntimeException("Not implemented");
+                        }
                     }
 
                     Object res = operation.compile(ast[++pointer], compilerContext);
@@ -124,7 +144,6 @@ public class LispCompiler {
                         }
                         res = ((Operation) res).compile(ast[++pointer], compilerContext);
                     }
-                    parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class), (CodeBlock) res);
 
                 } else {
                     throw new RuntimeException("Not implemented");
@@ -132,11 +151,9 @@ public class LispCompiler {
             }
 
         } else {
-            parentClass.defineMethod(methodName, ACC_PUBLIC , CodegenUtils.sig(Object.class),
-                    newCodeBlock().aconst_null().areturn());
+            compilerContext.currentBlock().aconst_null();
         }
-
-        return parentClass;
     }
 
+    
 }

@@ -18,9 +18,7 @@
  */
 package net.saga.diy.lisp.compiler.operation;
 
-import java.util.UUID;
 import me.qmx.jitescript.CodeBlock;
-import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.JiteClass;
 import me.qmx.jitescript.internal.org.objectweb.asm.tree.LabelNode;
 import static me.qmx.jitescript.util.CodegenUtils.p;
@@ -45,121 +43,96 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
     @Override
     public Operation<CodeBlock> compile(Object token, CompilerContext compilerContext) {
         JiteClass env = compilerContext.jiteClass;
-        final String firstMethodName = verifyAndCompile(token, compilerContext);
+
+        verifyAndCompile(token, compilerContext);
+        compilerContext.currentBlock().checkcast(p(Integer.class))
+                .invokevirtual(p(Integer.class), "intValue", sig(int.class));
 
         switch (op) {
             case ADD:
                 return ((nextToken, context2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, context2);
-                    CodeBlock addCodeBlock = newCodeBlock();
+                    verifyAndCompile(nextToken, context2);
+                    CodeBlock addCodeBlock = context2.currentBlock();
 
                     addCodeBlock
-                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
-                            .checkcast(p(Integer.class))
-                            .invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class))
                             .invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .iadd()
-                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class))
-                            .areturn();
+                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class));
                     return addCodeBlock;
                 });
 
             case SUB:
                 return ((nextToken, context2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, context2);
-                    CodeBlock subCodeBlock = newCodeBlock();
+                    verifyAndCompile(nextToken, context2);
+                    CodeBlock subCodeBlock = context2.currentBlock();
 
                     subCodeBlock
-                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
-                            .checkcast(p(Integer.class))
-                            .invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class))
                             .invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .isub()
-                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class))
-                            .areturn();
+                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class));
                     return subCodeBlock;
                 });
             case DIV:
                 return ((nextToken, context2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, context2);
-                    CodeBlock divCodeBlock = newCodeBlock();
+                    verifyAndCompile(nextToken, context2);
+                    CodeBlock divCodeBlock = context2.currentBlock();
 
                     divCodeBlock
-                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
-                            .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .idiv()
-                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class))
-                            .areturn();
+                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class));
                     return divCodeBlock;
                 });
             case MOD:
                 return ((nextToken, context2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, context2);
-                    CodeBlock modCodeBlock = newCodeBlock();
+                    verifyAndCompile(nextToken, context2);
+                    CodeBlock modCodeBlock = context2.currentBlock();
 
                     modCodeBlock
-                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
-                            .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .irem()
-                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class))
-                            .areturn();
+                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class));
                     return modCodeBlock;
                 });
             case GT:
                 return ((nextToken, context2) -> {
                     LabelNode isGreater = new LabelNode();
-                    String secondMethodName = verifyAndCompile(nextToken, context2);
-                    CodeBlock gtCodeBlock = newCodeBlock();
+                    verifyAndCompile(nextToken, context2);
+                    CodeBlock gtCodeBlock = context2.currentBlock();
 
                     gtCodeBlock
-                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
-                            .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .if_icmpgt(isGreater)
                             .ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn()
                             .label(isGreater)
-                            .ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn();
+                            .ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
                     return gtCodeBlock;
                 });
             case LT:
                 return ((nextToken, context2) -> {
                     LabelNode isLesser = new LabelNode();
-                    String secondMethodName = verifyAndCompile(nextToken, context2);
-                    CodeBlock ltCodeBlock = newCodeBlock();
+                    verifyAndCompile(nextToken, context2);
+                    CodeBlock ltCodeBlock = context2.currentBlock();
 
                     ltCodeBlock
-                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
-                            .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .if_icmplt(isLesser)
                             .ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn()
                             .label(isLesser)
-                            .ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn();
+                            .ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
                     return ltCodeBlock;
                 });
             case MULT:
                 return ((nextToken, context2) -> {
-                    String secondMethodName = verifyAndCompile(nextToken, context2);
-                    CodeBlock multCodeBlock = newCodeBlock();
+                    verifyAndCompile(nextToken, context2);
+                    CodeBlock multCodeBlock = context2.currentBlock();
 
                     multCodeBlock
-                            .aload(0).invokevirtual(env.getClassName(), firstMethodName, sig(Object.class))
-                            .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
-                            .aload(0).invokevirtual(env.getClassName(), secondMethodName, sig(Object.class))
                             .checkcast(p(Integer.class)).invokevirtual(p(Integer.class), "intValue", sig(int.class))
                             .imul()
-                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class))
-                            .areturn();
+                            .invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class));
                     return multCodeBlock;
                 });
             default:
@@ -177,13 +150,11 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
      * @param env
      * @return 
      */
-    private String verifyAndCompile(Object token, CompilerContext env) {
-
-        String methodName = "operand" + UUID.randomUUID().toString();
+    private void verifyAndCompile(Object token, CompilerContext env) {
 
         if (token instanceof Integer) {
-            LispCompiler.compile(token, env, methodName);
-            return methodName;
+            LispCompiler.compileBlock(token, env);
+            return;
         }
 
         if (token instanceof String) {
@@ -191,8 +162,8 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
         }
 
         if (token.getClass().isArray()) {
-            LispCompiler.compile(token, env, methodName);
-            return methodName;
+            LispCompiler.compileBlock(token, env);
+            return;
         }
 
         throw new LispException("Math operations expect a Integer");

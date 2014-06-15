@@ -21,7 +21,6 @@ package net.saga.diy.lisp.compiler.operation;
 import java.util.UUID;
 import me.qmx.jitescript.CodeBlock;
 import static me.qmx.jitescript.CodeBlock.newCodeBlock;
-import me.qmx.jitescript.JiteClass;
 import me.qmx.jitescript.internal.org.objectweb.asm.tree.LabelNode;
 import me.qmx.jitescript.util.CodegenUtils;
 import static me.qmx.jitescript.util.CodegenUtils.p;
@@ -31,35 +30,26 @@ import net.saga.diy.lisp.types.CompilerContext;
 public class IfOperation implements Operation<Operation<Operation<CodeBlock>>> {
 
     @Override
-    public Operation<Operation<CodeBlock>> compile(Object token, CompilerContext context) {
+    public Operation<Operation<CodeBlock>> compile(Object ifExpression, CompilerContext context) {
 
-        return ((trueToken, trueClass) -> {
-            return ((falseToken, falseClass) -> {
+        return ((trueBlock, trueClass) -> {
+            return ((falseBlock, falseClass) -> {
                 LabelNode trueNode = new LabelNode();
                 LabelNode falseNode = new LabelNode();
+                LabelNode afterNode = new LabelNode();
 
-                String evaluateIfMethod = "if_" + UUID.randomUUID().toString();
-                LispCompiler.compile(token, context, evaluateIfMethod);
-
-                String trueMethod = "true_" + UUID.randomUUID().toString();
-                LispCompiler.compile(trueToken, trueClass, trueMethod);
-
-                String falseMethod = "false_" + UUID.randomUUID().toString();
-                LispCompiler.compile(falseToken, falseClass, falseMethod);
+                CodeBlock codeBlock = context.currentBlock();
                 
-                CodeBlock codeBlock = newCodeBlock();
-                codeBlock.aload(0);
-                codeBlock.invokevirtual(context.getClassName(), evaluateIfMethod, CodegenUtils.sig(Object.class));
+                LispCompiler.compileBlock(ifExpression, context);
                 codeBlock.checkcast(p(Boolean.class));
                 codeBlock.invokevirtual(p(Boolean.class), "booleanValue", CodegenUtils.sig(boolean.class));
                 codeBlock.iftrue(trueNode);
                 codeBlock.label(falseNode);
-                codeBlock.aload(0);
-                codeBlock.invokevirtual(context.getClassName(), falseMethod, CodegenUtils.sig(Object.class)).areturn();
+                LispCompiler.compileBlock(falseBlock, falseClass);
+                codeBlock.go_to(afterNode);
                 codeBlock.label(trueNode);
-                codeBlock.aload(0);
-                codeBlock.invokevirtual(context.getClassName(), trueMethod, CodegenUtils.sig(Object.class)).areturn();
-                
+                LispCompiler.compileBlock(trueBlock, trueClass);
+                codeBlock.label(afterNode);
                 return codeBlock;
             });
         });

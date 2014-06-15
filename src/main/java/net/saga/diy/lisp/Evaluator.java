@@ -20,7 +20,6 @@ package net.saga.diy.lisp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import static net.saga.diy.lisp.SpecialTokens.QUOTE;
 import net.saga.diy.lisp.evaluator.operation.AtomOperation;

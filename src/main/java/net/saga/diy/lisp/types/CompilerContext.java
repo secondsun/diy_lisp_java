@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import me.qmx.jitescript.CodeBlock;
+import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.JiteClass;
 import me.qmx.jitescript.internal.org.objectweb.asm.Opcodes;
 import me.qmx.jitescript.util.CodegenUtils;
@@ -37,6 +39,7 @@ public class CompilerContext {
     private final Map<String, Object> variables = new HashMap<>();
     private final Set<String> methods = new HashSet<>();
     private CompilerContext parentContext = null;
+    private CodeBlock currentBlock = newCodeBlock();
     
     public CompilerContext() {
         this("anonymous");
@@ -57,7 +60,7 @@ public class CompilerContext {
             variables.put(variableName, value);
         }
 
-        jiteClass.defineField(variableName, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, CodegenUtils.ci(Object.class), value);
+        jiteClass.defineField(variableName, Opcodes.ACC_PUBLIC , CodegenUtils.ci(Object.class), value);
         
         return this;
 
@@ -65,7 +68,7 @@ public class CompilerContext {
 
     public Object lookup(String var) throws LispException {
         Object res = variables.get(var);
-        if (res == null) {
+        if (res == null && !variables.containsKey(var)) {
             if (parentContext == null) {
                 throw new LispException(var + " is not defined");
             }
@@ -87,4 +90,13 @@ public class CompilerContext {
         return jiteClass.getClassName();
     }
     
+    public CompilerContext blockToMethod(String methodName) {
+        jiteClass.defineMethod(methodName, Opcodes.ACC_PUBLIC, CodegenUtils.sig(Object.class), currentBlock);
+        currentBlock = newCodeBlock();
+        return this;
+    }
+    
+    public CodeBlock currentBlock() {
+        return this.currentBlock;
+    }    
 }

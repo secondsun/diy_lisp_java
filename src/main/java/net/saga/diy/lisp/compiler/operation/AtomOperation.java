@@ -35,7 +35,7 @@ public class AtomOperation implements Operation<CodeBlock> {
     @Override
     public CodeBlock compile(Object token, CompilerContext context) {
         
-        CodeBlock codeBlock = newCodeBlock();
+        CodeBlock codeBlock = context.currentBlock();
         
         if (!token.getClass().isArray()) {
             return codeBlock.ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class)).areturn();

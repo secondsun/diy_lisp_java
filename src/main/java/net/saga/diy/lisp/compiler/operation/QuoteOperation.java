@@ -34,7 +34,7 @@ public class QuoteOperation implements Operation<CodeBlock> {
     @Override
     public CodeBlock compile(Object token, CompilerContext compilerContext) {
         
-        CodeBlock codeBlock = newCodeBlock();
+        CodeBlock codeBlock = compilerContext.currentBlock();
         
         if (token.getClass().isArray()) {
             Object[] array = (Object[]) token;
@@ -56,11 +56,11 @@ public class QuoteOperation implements Operation<CodeBlock> {
                 codeBlock.aastore();
             }
 
-            codeBlock.areturn();
+            
 
             return codeBlock;
         } else {
-            return codeBlock.ldc(token).areturn();
+            return codeBlock.ldc(token);
         }
 
     }
