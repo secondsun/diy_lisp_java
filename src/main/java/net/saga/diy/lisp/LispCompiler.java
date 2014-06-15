@@ -19,12 +19,8 @@
 package net.saga.diy.lisp;
 
 import java.io.FileOutputStream;
-import static javax.management.Query.value;
 import me.qmx.jitescript.CodeBlock;
-import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.JiteClass;
-import static me.qmx.jitescript.internal.org.objectweb.asm.Opcodes.ACC_PUBLIC;
-import me.qmx.jitescript.util.CodegenUtils;
 import static me.qmx.jitescript.util.CodegenUtils.c;
 import static me.qmx.jitescript.util.CodegenUtils.p;
 import static me.qmx.jitescript.util.CodegenUtils.sig;
@@ -49,7 +45,7 @@ import net.saga.diy.lisp.types.LispException;
  */
 public class LispCompiler {
 
-    private static class DynamicClassLoader extends ClassLoader {
+    public static class DynamicClassLoader extends ClassLoader {
 
         public Class<?> define(JiteClass jiteClass) {
             byte[] classBytes = jiteClass.toBytes();
@@ -77,17 +73,16 @@ public class LispCompiler {
         JiteClass parentClass = compilerContext.jiteClass;
 
         compileBlock(rootToken, compilerContext); //Compile expression
-        
+
         compilerContext.currentBlock().areturn(); // return value of expression
-        
+
         compilerContext.blockToMethod(methodName);
 
         return parentClass;
     }
 
-    
     public static void compileBlock(Object rootToken, CompilerContext compilerContext) {
-        
+
         if (rootToken.getClass() == Boolean.class) {
             if ((Boolean) rootToken) {
                 compilerContext.currentBlock().ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
@@ -98,7 +93,6 @@ public class LispCompiler {
         } else if (rootToken.getClass() == Integer.class) {
 
             compilerContext.currentBlock().ldc((int) rootToken).invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class));
-            
 
         } else if (rootToken.getClass().isArray()) {
             Object[] ast = (Object[]) rootToken;
@@ -112,7 +106,9 @@ public class LispCompiler {
             for (int pointer = 0; pointer < length; pointer++) {
                 Object token = ast[pointer];
 
-                if (token.getClass() == String.class) {
+                if (token.getClass().isArray()) {
+                    compileBlock(token, compilerContext);
+                } else if (token.getClass() == String.class) {
                     if (QUOTE.equals(token)) {
                         operation = new QuoteOperation();
                     } else if (ATOM.equals(token)) {
@@ -129,8 +125,7 @@ public class LispCompiler {
                         operation = new LookupOperation();
                         CodeBlock result = (CodeBlock) operation.compile(token, compilerContext);
                         if (!(result instanceof net.saga.diy.lisp.evaluator.operation.Operation)) {
-                            throw new RuntimeException("This won't work because it will create tons of extra methods exception");
-
+                            continue;
                         } else {
                             throw new RuntimeException("Not implemented");
                         }
@@ -146,14 +141,19 @@ public class LispCompiler {
                     }
 
                 } else {
-                    throw new RuntimeException("Not implemented");
+                    throw new LispException(token + "is not implemented or is not a valid token");
                 }
             }
 
         } else {
-            compilerContext.currentBlock().aconst_null();
+            Operation operation = new LookupOperation();
+            CodeBlock result = (CodeBlock) operation.compile(rootToken, compilerContext);
+            if (!(result instanceof net.saga.diy.lisp.evaluator.operation.Operation)) {
+                
+            } else {
+                throw new RuntimeException("Not implemented");
+            }
         }
     }
 
-    
 }

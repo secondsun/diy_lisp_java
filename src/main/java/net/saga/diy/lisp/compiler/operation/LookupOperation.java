@@ -31,7 +31,7 @@ public class LookupOperation implements Operation<CodeBlock> {
     @Override
     public CodeBlock compile(Object symbolName, CompilerContext compilerContext) {
         compilerContext.lookup((String) symbolName);
-        return CodeBlock.newCodeBlock().aload(0).getfield(compilerContext.getClassName(), (String) symbolName, ci(Object.class));
+        return compilerContext.currentBlock().aload(0).getfield(compilerContext.getClassName(), (String) symbolName, ci(Object.class));
     }
 
 }
