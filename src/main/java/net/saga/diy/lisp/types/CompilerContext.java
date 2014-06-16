@@ -83,6 +83,8 @@ public class CompilerContext {
         CompilerContext childContext = new CompilerContext(childClassName);
         childContext.parentContext = this;
         childContext.defineVariable(variableName, value);
+        jiteClass.addChildClass(childClassName, childContext.jiteClass);
+        
         return childContext;
     }
     
@@ -91,12 +93,32 @@ public class CompilerContext {
     }
     
     public CompilerContext blockToMethod(String methodName) {
+        if (methods.contains(methodName)) {
+            throw new LispException(methodName + " already defined");
+        }
         jiteClass.defineMethod(methodName, Opcodes.ACC_PUBLIC, CodegenUtils.sig(Object.class), currentBlock);
+        methods.add(methodName);
         currentBlock = newCodeBlock();
         return this;
     }
     
+    
     public CodeBlock currentBlock() {
         return this.currentBlock;
     }    
+    
+    public Set<String> getMethods() {
+        return new HashSet<>(methods);//defensive copy
+    }
+
+    public CompilerContext extend() {
+        childClassCount++;
+        String childClassName = jiteClass.getClassName() + "$" + childClassCount;
+        CompilerContext childContext = new CompilerContext(childClassName);
+        childContext.parentContext = this;
+        jiteClass.addChildClass(childContext.jiteClass);
+        return childContext;
+    }
+ 
+    
 }

@@ -32,10 +32,11 @@ import net.saga.diy.lisp.compiler.operation.AtomOperation;
 import net.saga.diy.lisp.compiler.operation.DefineOperation;
 import net.saga.diy.lisp.compiler.operation.EqOperation;
 import net.saga.diy.lisp.compiler.operation.IfOperation;
+import net.saga.diy.lisp.compiler.operation.LambdaOperation;
+import net.saga.diy.lisp.compiler.operation.LookupOperation;
 import net.saga.diy.lisp.compiler.operation.MathOperation;
 import net.saga.diy.lisp.compiler.operation.Operation;
 import net.saga.diy.lisp.compiler.operation.QuoteOperation;
-import net.saga.diy.lisp.compiler.operation.LookupOperation;
 import net.saga.diy.lisp.types.CompilerContext;
 import net.saga.diy.lisp.types.LispException;
 
@@ -50,12 +51,18 @@ public class LispCompiler {
         public Class<?> define(JiteClass jiteClass) {
             byte[] classBytes = jiteClass.toBytes();
 
-            try (FileOutputStream fos = new FileOutputStream("/tmp/anonymous.class")) {
+            try (FileOutputStream fos = new FileOutputStream(String.format("/tmp/%s.class", jiteClass.getClassName()))) {
                 fos.write(classBytes);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
 
+            if (jiteClass.getChildClasses().size() > 0) {
+                jiteClass.getChildClasses().stream().forEach((child) -> {
+                    define(child);
+                });
+            }
+            
             return super.defineClass(c(jiteClass.getClassName()), classBytes, 0, classBytes.length);
         }
     }
@@ -121,6 +128,8 @@ public class LispCompiler {
                         operation = new DefineOperation();
                     } else if (SpecialTokens.MATHS.contains(token)) {
                         operation = new MathOperation(token);
+                    }  else if (SpecialTokens.LAMBDA.equals(token)) {
+                        operation = new LambdaOperation();
                     } else {
                         operation = new LookupOperation();
                         CodeBlock result = (CodeBlock) operation.compile(token, compilerContext);
@@ -133,7 +142,7 @@ public class LispCompiler {
 
                     Object res = operation.compile(ast[++pointer], compilerContext);
 
-                    while (res instanceof Operation) {
+                    while (res instanceof Operation) {                        
                         if ((pointer + 1) >= ast.length) {
                             throw new LispException("Missing token");
                         }
