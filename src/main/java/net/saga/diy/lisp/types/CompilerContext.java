@@ -27,6 +27,8 @@ import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.JiteClass;
 import me.qmx.jitescript.internal.org.objectweb.asm.Opcodes;
 import me.qmx.jitescript.util.CodegenUtils;
+import static me.qmx.jitescript.util.CodegenUtils.p;
+import static me.qmx.jitescript.util.CodegenUtils.sig;
 
 /**
  *
@@ -40,7 +42,7 @@ public class CompilerContext {
     private final Set<String> methods = new HashSet<>();
     private CompilerContext parentContext = null;
     private CodeBlock currentBlock = newCodeBlock();
-    
+
     public CompilerContext() {
         this("anonymous");
     }
@@ -53,6 +55,25 @@ public class CompilerContext {
         };
     }
 
+    public CompilerContext(String applicationName, JiteClass parentClass) {
+        jiteClass = new JiteClass(applicationName) {
+            {
+
+                defineField("context", ACC_PRIVATE | ACC_FINAL, CodegenUtils.ci(Object.class), null);
+
+                defineMethod("<init>", ACC_PUBLIC, CodegenUtils.sig(void.class, Object.class),
+                        newCodeBlock()
+                        .aload(0)
+                        .aload(1)
+                        .putfield(applicationName, "context", CodegenUtils.ci(Object.class))
+                        .aload(0)
+                        .invokespecial(p((Class) Object.class), "<init>", sig(void.class))
+                        .voidreturn()
+                );
+            }
+        };
+    }
+
     public CompilerContext defineVariable(String variableName, Object value) throws LispException {
         if (variables.containsKey(variableName)) {
             throw new LispException(variableName + " already defined");
@@ -60,8 +81,8 @@ public class CompilerContext {
             variables.put(variableName, value);
         }
 
-        jiteClass.defineField(variableName, Opcodes.ACC_PUBLIC , CodegenUtils.ci(Object.class), value);
-        
+        jiteClass.defineField(variableName, Opcodes.ACC_PUBLIC, CodegenUtils.ci(Object.class), value);
+
         return this;
 
     }
@@ -77,6 +98,25 @@ public class CompilerContext {
         return res;
     }
 
+    /**
+     *
+     * @param var the variable to generate a lookup for
+     * @return the depth of the lookups for applying context objects
+     * @throws LispException
+     */
+    public int getFieldDepth(String var) throws LispException {
+        int depth = 0;
+        Object res = lookup(var); //Confirm the variable exists
+        
+        if (!variables.containsKey(var)) {
+            depth = 1;
+            depth += parentContext.getFieldDepth(var);
+        } 
+
+        return depth;
+        
+    }
+
     public CompilerContext extend(String variableName, Object value) {
         childClassCount++;
         String childClassName = jiteClass.getClassName() + "_" + childClassCount;
@@ -84,14 +124,14 @@ public class CompilerContext {
         childContext.parentContext = this;
         childContext.defineVariable(variableName, value);
         jiteClass.addChildClass(childClassName, childContext.jiteClass);
-        
+
         return childContext;
     }
-    
+
     public String getClassName() {
         return jiteClass.getClassName();
     }
-    
+
     public CompilerContext blockToMethod(String methodName) {
         if (methods.contains(methodName)) {
             throw new LispException(methodName + " already defined");
@@ -101,12 +141,11 @@ public class CompilerContext {
         currentBlock = newCodeBlock();
         return this;
     }
-    
-    
+
     public CodeBlock currentBlock() {
         return this.currentBlock;
-    }    
-    
+    }
+
     public Set<String> getMethods() {
         return new HashSet<>(methods);//defensive copy
     }
@@ -114,11 +153,18 @@ public class CompilerContext {
     public CompilerContext extend() {
         childClassCount++;
         String childClassName = jiteClass.getClassName() + "$" + childClassCount;
-        CompilerContext childContext = new CompilerContext(childClassName);
+        CompilerContext childContext = new CompilerContext(childClassName, jiteClass);
         childContext.parentContext = this;
         jiteClass.addChildClass(childContext.jiteClass);
         return childContext;
     }
- 
+
+    public CompilerContext getParentContext() {
+        return parentContext;
+    }
+
+    public String getClassSig() {
+        return "L" + getClassName() + ";";
+    }
     
 }

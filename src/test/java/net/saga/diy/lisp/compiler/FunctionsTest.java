@@ -19,6 +19,7 @@
 package net.saga.diy.lisp.compiler;
 
 import com.google.common.collect.Maps;
+import java.lang.reflect.Constructor;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,13 +56,16 @@ public class FunctionsTest {
      * from when the function was created in order to resolve all free variables.
      */
     @Test
-    public void testLambdaKeepsDefiningEnv() {
+    public void testLambdaKeepsDefiningEnv() throws Exception {
 
-//        Environment env = new Environment(map(entry("foo", 1), entry("bar", 2)));
-//        Object ast = (Object[]) parse("(lambda () 42)");
-//        Closure closure = (Closure) evaluate(ast, env);
-//        assertEquals(env, closure.getEnv());
-        throw new RuntimeException("Not implemented");
+        CompilerContext env = new CompilerContext().defineVariable("foo", 42);
+        
+        Object ast = (Object[]) parse("(lambda () foo)");
+        LispCompiler.compileBlock(ast, env);
+        Object klass = toInstance(env);
+        Object childKlass = childInstance(env, klass);
+        assertEquals(42, childKlass.getClass().getMethod("lambda", null).invoke(childKlass, null));
+//        throw new RuntimeException("Not implemented");
     }
 
     /* The closure contains the parameter list and function body too. */
@@ -122,20 +126,6 @@ throw new RuntimeException("Not implemented");
      * """
      */
 
-    /*
-     * The first case we'll handle is when the AST is a list with an actual closure
-     * as the first element.
-     * 
-     * In this first test, we'll start with a closure with no arguments and no free
-     * variables. All we need to do is to evaluate and return the function body.
-     */
-    @Test
-    public void testCallToClosure() {
-//        Closure closure = (Closure) evaluate((Object[]) parse("(lambda () (+ 1 2))"), new Environment());
-//        Object[] ast = new Object[]{closure};
-//        assertEquals(3, evaluate(ast, new Environment()));
-        throw new RuntimeException("Not implemented");
-    }
 
     /*
      * The function body must be evaluated in an environment where the parameters are bound.
@@ -352,5 +342,11 @@ throw new RuntimeException("Not implemented");
             throw new RuntimeException(ex);
         }
         
+    }
+
+    private Object childInstance(CompilerContext env, Object parentInstance) throws Exception {
+        Class<?> childClass = parentInstance.getClass().getDeclaredClasses()[0];
+        Constructor<?> constructor = childClass.getConstructor(Object.class);
+        return constructor.newInstance(parentInstance);
     }
 }

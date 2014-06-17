@@ -20,10 +20,7 @@ package net.saga.diy.lisp.compiler.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-import me.qmx.jitescript.CodeBlock;
-import me.qmx.jitescript.JiteClass;
 import net.saga.diy.lisp.LispCompiler;
-import net.saga.diy.lisp.types.Closure;
 import net.saga.diy.lisp.types.CompiledClosure;
 import net.saga.diy.lisp.types.CompilerContext;
 import net.saga.diy.lisp.types.LispException;

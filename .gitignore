@@ -29,3 +29,6 @@ build/
 
 gen/
 lint.xml
+
+######### NetBeans ##########
+nb-configuration.xml
