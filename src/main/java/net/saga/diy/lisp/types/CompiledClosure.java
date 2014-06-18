@@ -19,7 +19,6 @@
 package net.saga.diy.lisp.types;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import static net.saga.diy.lisp.types.Utils.isList;
 

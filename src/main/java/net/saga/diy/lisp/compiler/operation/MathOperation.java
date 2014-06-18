@@ -158,7 +158,8 @@ public class MathOperation implements Operation<Operation<CodeBlock>> {
         }
 
         if (token instanceof String) {
-            throw new RuntimeException("Not implemented");
+            new LookupOperation().compile(token, env);
+            return;
         }
 
         if (token.getClass().isArray()) {

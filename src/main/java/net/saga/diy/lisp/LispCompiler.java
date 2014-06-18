@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import me.qmx.jitescript.CodeBlock;
 import me.qmx.jitescript.JiteClass;
 import static me.qmx.jitescript.util.CodegenUtils.c;
+import static me.qmx.jitescript.util.CodegenUtils.ci;
 import static me.qmx.jitescript.util.CodegenUtils.p;
 import static me.qmx.jitescript.util.CodegenUtils.sig;
 import static net.saga.diy.lisp.SpecialTokens.ATOM;
@@ -37,6 +38,7 @@ import net.saga.diy.lisp.compiler.operation.LookupOperation;
 import net.saga.diy.lisp.compiler.operation.MathOperation;
 import net.saga.diy.lisp.compiler.operation.Operation;
 import net.saga.diy.lisp.compiler.operation.QuoteOperation;
+import net.saga.diy.lisp.types.CompiledClosure;
 import net.saga.diy.lisp.types.CompilerContext;
 import net.saga.diy.lisp.types.LispException;
 
@@ -88,18 +90,18 @@ public class LispCompiler {
         return parentClass;
     }
 
-    public static void compileBlock(Object rootToken, CompilerContext compilerContext) {
+    public static Object compileBlock(Object rootToken, CompilerContext compilerContext) {
 
         if (rootToken.getClass() == Boolean.class) {
             if ((Boolean) rootToken) {
-                compilerContext.currentBlock().ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
+                return compilerContext.currentBlock().ldc(Boolean.TRUE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
             } else {
-                compilerContext.currentBlock().ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
+                return compilerContext.currentBlock().ldc(Boolean.FALSE).invokestatic(p(Boolean.class), "valueOf", sig(Boolean.class, boolean.class));
             }
 
         } else if (rootToken.getClass() == Integer.class) {
 
-            compilerContext.currentBlock().ldc((int) rootToken).invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class));
+            return compilerContext.currentBlock().ldc((int) rootToken).invokestatic(p(Integer.class), "valueOf", sig(Integer.class, int.class));
 
         } else if (rootToken.getClass().isArray()) {
             Object[] ast = (Object[]) rootToken;
@@ -109,12 +111,21 @@ public class LispCompiler {
             if (length == 0) {
                 compilerContext.currentBlock().aconst_null();
             }
-
+            
+            Object res = null;
+            
             for (int pointer = 0; pointer < length; pointer++) {
                 Object token = ast[pointer];
 
                 if (token.getClass().isArray()) {
-                    compileBlock(token, compilerContext);
+                    res = compileBlock(token, compilerContext);
+                    if (res instanceof CompiledClosure) {
+                        CompiledClosure closure = (CompiledClosure) res;
+                        compilerContext.currentBlock().newobj(closure.getContext().getClassName())
+                                .dup().aload(0).invokespecial(closure.getContext().getClassName(), "<init>", "(Ljava/lang/Object;)V");
+                        
+                        compilerContext.currentBlock().invokevirtual(closure.getContext().getClassName(), "lambda", sig(Object.class));
+                    }
                 } else if (token.getClass() == String.class) {
                     if (QUOTE.equals(token)) {
                         operation = new QuoteOperation();
@@ -140,7 +151,7 @@ public class LispCompiler {
                         }
                     }
 
-                    Object res = operation.compile(ast[++pointer], compilerContext);
+                    res = operation.compile(ast[++pointer], compilerContext);
 
                     while (res instanceof Operation) {                        
                         if ((pointer + 1) >= ast.length) {
@@ -148,17 +159,17 @@ public class LispCompiler {
                         }
                         res = ((Operation) res).compile(ast[++pointer], compilerContext);
                     }
-
+                    
                 } else {
                     throw new LispException(token + "is not implemented or is not a valid token");
                 }
             }
-
+            return res;
         } else {
             Operation operation = new LookupOperation();
             CodeBlock result = (CodeBlock) operation.compile(rootToken, compilerContext);
             if (!(result instanceof net.saga.diy.lisp.evaluator.operation.Operation)) {
-                
+                return result;
             } else {
                 throw new RuntimeException("Not implemented");
             }

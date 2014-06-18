@@ -18,9 +18,7 @@
  */
 package net.saga.diy.lisp.compiler.operation;
 
-import java.util.UUID;
 import me.qmx.jitescript.CodeBlock;
-import static me.qmx.jitescript.CodeBlock.newCodeBlock;
 import me.qmx.jitescript.internal.org.objectweb.asm.tree.LabelNode;
 import me.qmx.jitescript.util.CodegenUtils;
 import static me.qmx.jitescript.util.CodegenUtils.p;

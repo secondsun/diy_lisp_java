@@ -20,6 +20,7 @@ package net.saga.diy.lisp.compiler;
 
 import com.google.common.collect.Maps;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,8 +30,13 @@ import java.util.logging.Logger;
 import me.qmx.jitescript.JiteClass;
 import net.saga.diy.lisp.LispCompiler;
 import static net.saga.diy.lisp.Parser.parse;
+import net.saga.diy.lisp.types.CompiledClosure;
 import net.saga.diy.lisp.types.CompilerContext;
 import net.saga.diy.lisp.types.LispException;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -48,7 +54,7 @@ public class FunctionsTest {
         Class klass = toClass(context);
         assertEquals(1, klass.getDeclaredClasses().length);
     }
-    
+
     /*
      * The closure should keep a copy of the environment where it was defined.
      * 
@@ -59,26 +65,25 @@ public class FunctionsTest {
     public void testLambdaKeepsDefiningEnv() throws Exception {
 
         CompilerContext env = new CompilerContext().defineVariable("foo", 42);
-        
+
         Object ast = (Object[]) parse("(lambda () foo)");
         LispCompiler.compileBlock(ast, env);
         Object klass = toInstance(env);
         Object childKlass = childInstance(env, klass);
         assertEquals(42, childKlass.getClass().getMethod("lambda", null).invoke(childKlass, null));
-//        throw new RuntimeException("Not implemented");
     }
 
-    /* The closure contains the parameter list and function body too. */
-    @Test
-    public void testLambdaClosureHoldsFunction() {
-//        Object ast = (Object[]) parse("(lambda (x y) (+ x y))");
-//        Closure closure = (Closure) evaluate(ast, new Environment());
-//
-//        Object[] expected = new Object[]{"+", "x", "y"};
-//
-//        assertArrayEquals(new Object[]{"x", "y"}, closure.getParams());
-//        assertArrayEquals(expected, (Object[]) closure.getBody());
-throw new RuntimeException("Not implemented");
+
+
+    /* The `lambda` form should expect exactly two arguments. */
+    @Test(expected = LispException.class)
+    public void testLambdaNumbeOfArguments() {
+        
+        Object[] ast = (Object[]) parse("(lambda (foo) (bar) (baz))");
+        
+        CompilerContext env = new CompilerContext().defineVariable("foo", 42);
+        CompiledClosure closure = (CompiledClosure) LispCompiler.compileBlock(ast, env);
+
     }
 
     /* The parameters of a `lambda` should be a list. */
@@ -93,27 +98,22 @@ throw new RuntimeException("Not implemented");
 
     @Test(expected = LispException.class)
     public void testLambdaFails() {
-//        evaluate((Object[]) parse("(lambda not-a-list (body of fn))"), new Environment());
-        throw new RuntimeException("Not implemented");
+        Object[] ast = (Object[]) parse("(lambda not-a-list (body of fn))");
+        CompilerContext env = new CompilerContext().defineVariable("foo", 42);
+        CompiledClosure closure = (CompiledClosure) LispCompiler.compileBlock(ast, env);
     }
 
-    /* The `lambda` form should expect exactly two arguments. */
-    @Test(expected = LispException.class)
-    public void testLambdaNumbeOfArguments() {
-//        evaluate((Object[]) parse("(lambda (foo) (bar) (baz))"), new Environment());
-        throw new RuntimeException("Not implemented");
-    }
 
-    /*
-     * The function body should not be evaluated when the lambda is defined.
+    /**
+     * @TODO: UPdate doc
      * 
-     * The call to `lambda` should return a function closure holding, among other things
-     * the function body. The body should not be evaluated before the function is called.
-     */
-    @Test
-    public void testBodyIsNotEvaluated() {
-//        evaluate((Object[]) parse("(lambda (foo) (function body ((that) would never) work))"), new Environment());
-        throw new RuntimeException("Not implemented");
+     * One of the tricks is that a body IS cmpiled as opposed to the evaluator where it is interpreted lazily.
+    */
+    @Test(expected = LispException.class)
+    public void testBodyIsCompiled() {
+        Object[] ast = (Object[]) parse("(lambda (foo) (function body ((that) would never) work))");
+        CompilerContext env = new CompilerContext().defineVariable("foo", 42);
+        CompiledClosure closure = (CompiledClosure) LispCompiler.compileBlock(ast, env);
     }
 
     /*
@@ -125,8 +125,6 @@ throw new RuntimeException("Not implemented");
      * the function, and the rest of the elements are arguments.
      * """
      */
-
-
     /*
      * The function body must be evaluated in an environment where the parameters are bound.
      * 
@@ -135,15 +133,36 @@ throw new RuntimeException("Not implemented");
      * when evaluating the function body.
      */
     @Test
-    public void testCallWithArguments() {
-//        Environment env = new Environment();
-//        Closure closure = (Closure) evaluate((Object[]) parse("(lambda (a b) (+ a b))"), env);
-//        Object[] ast = new Object[]{closure, 4, 5};
-//
-//        assertEquals(9, evaluate(ast, env));
-        throw new RuntimeException("Not implemented");
+    public void testLambdaClosureWithParams() throws Exception {
+        Object ast = (Object[]) parse("(lambda (x y) (+ x y))");
+        CompilerContext env = new CompilerContext().defineVariable("x", 42);
+        CompiledClosure closure = (CompiledClosure) LispCompiler.compileBlock(ast, env);
+        assertArrayEquals(new Object[]{"x", "y"}, closure.getParams());
+
+        Object klass = toInstance(env);
+        Object childInstance = childInstance(env, klass);
+        Class<?> childClass = childInstance.getClass();
+
+        childClass.getField("x").set(childInstance, 21);
+        childClass.getField("y").set(childInstance, 21);
+        Method lambdaMethod = childInstance.getClass().getMethod("lambda", new Class<?>[0]);
+
+        assertEquals(42, lambdaMethod.invoke(childInstance, new Object[0]));
     }
 
+    @Test
+    public void testCallLambdaClosure() throws Exception {
+        Object ast = (Object[]) parse("((lambda () 42))");
+        
+        Class klass = LispCompiler.compile(ast);
+
+        Object instance = klass.newInstance();
+        
+        Method lambdaMethod = klass.getMethod("main", new Class<?>[0]);
+
+        assertEquals(42, lambdaMethod.invoke(instance, new Object[0]));
+    }
+    
     /*
      * Call to function should evaluate all arguments.
      * 
@@ -160,6 +179,11 @@ throw new RuntimeException("Not implemented");
 //        list.add(parse("(if #f 0 (+ 10 10))"));
 //        assertEquals(25, evaluate(list.toArray(), env));
         throw new RuntimeException("Not implemented");
+        
+        
+        
+        
+        
     }
 
     /*
@@ -330,7 +354,7 @@ throw new RuntimeException("Not implemented");
     private Class toClass(CompilerContext context) {
         return new LispCompiler.DynamicClassLoader().define(context.jiteClass);
     }
-    
+
     private Object toInstance(CompilerContext context) {
         try {
             JiteClass compiledClass = context.jiteClass;
@@ -341,7 +365,7 @@ throw new RuntimeException("Not implemented");
             Logger.getLogger(FunctionsTest.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
-        
+
     }
 
     private Object childInstance(CompilerContext env, Object parentInstance) throws Exception {
