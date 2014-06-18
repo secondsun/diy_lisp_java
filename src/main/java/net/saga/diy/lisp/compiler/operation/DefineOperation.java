@@ -40,15 +40,11 @@ public class DefineOperation implements Operation<Operation<CodeBlock>> {
         }
 
         return ((value, env2) -> {
-            String evaluateMethod = "evaluate" + UUID.randomUUID().toString();
-            LispCompiler.compileMethod(value, context, evaluateMethod);
-            context.defineVariable((String) name, null);
-            CodeBlock block = context.currentBlock();
-            block.aload(0);
-            block.aload(0);
-            block.invokevirtual(context.getClassName(), evaluateMethod, CodegenUtils.sig(Object.class));
-            block.putfield(context.getClassName(), (String) name, ci(Object.class));
-            return block;
+            context.currentBlock().aload(0);
+            Object result = LispCompiler.compileBlock(value, context);
+            context.defineVariable((String) name, result);
+            context.currentBlock().putfield(context.getClassName(), (String) name, ci(Object.class));
+            return context.currentBlock();
         });
 
         

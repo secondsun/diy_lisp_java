@@ -64,7 +64,7 @@ public class LispCompiler {
                     define(child);
                 });
             }
-            
+
             return super.defineClass(c(jiteClass.getClassName()), classBytes, 0, classBytes.length);
         }
     }
@@ -111,9 +111,9 @@ public class LispCompiler {
             if (length == 0) {
                 compilerContext.currentBlock().aconst_null();
             }
-            
+
             Object res = null;
-            
+
             for (int pointer = 0; pointer < length; pointer++) {
                 Object token = ast[pointer];
 
@@ -123,8 +123,23 @@ public class LispCompiler {
                         CompiledClosure closure = (CompiledClosure) res;
                         compilerContext.currentBlock().newobj(closure.getContext().getClassName())
                                 .dup().aload(0).invokespecial(closure.getContext().getClassName(), "<init>", "(Ljava/lang/Object;)V");
-                        
-                        compilerContext.currentBlock().invokevirtual(closure.getContext().getClassName(), "lambda", sig(Object.class));
+
+                        if (closure.getParams().length == 0) {
+                            compilerContext.currentBlock().invokevirtual(closure.getContext().getClassName(), "lambda", sig(Object.class));
+                            Object nextToken = ast[pointer+1];
+                            if (!nextToken.getClass().isArray() || (((Object[])nextToken).length > 0)) {
+                                throw new LispException("Illegal parameters");
+                            }
+                            pointer++;
+                        } else {
+                            for (Object param : closure.getParams()) {
+                                compilerContext.currentBlock().dup();
+                                Object paramResult = compileBlock(ast[++pointer], compilerContext);
+                                compilerContext.currentBlock().putfield(closure.getContext().getClassName(), param.toString(), ci(Object.class));
+                            }
+                            compilerContext.currentBlock().invokevirtual(closure.getContext().getClassName(), "lambda", sig(Object.class));
+                        }
+
                     }
                 } else if (token.getClass() == String.class) {
                     if (QUOTE.equals(token)) {
@@ -139,7 +154,7 @@ public class LispCompiler {
                         operation = new DefineOperation();
                     } else if (SpecialTokens.MATHS.contains(token)) {
                         operation = new MathOperation(token);
-                    }  else if (SpecialTokens.LAMBDA.equals(token)) {
+                    } else if (SpecialTokens.LAMBDA.equals(token)) {
                         operation = new LambdaOperation();
                     } else {
                         operation = new LookupOperation();
@@ -153,13 +168,13 @@ public class LispCompiler {
 
                     res = operation.compile(ast[++pointer], compilerContext);
 
-                    while (res instanceof Operation) {                        
+                    while (res instanceof Operation) {
                         if ((pointer + 1) >= ast.length) {
                             throw new LispException("Missing token");
                         }
                         res = ((Operation) res).compile(ast[++pointer], compilerContext);
                     }
-                    
+
                 } else {
                     throw new LispException(token + "is not implemented or is not a valid token");
                 }

@@ -37,7 +37,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /*This part is all about defining and using functions.
@@ -73,14 +73,12 @@ public class FunctionsTest {
         assertEquals(42, childKlass.getClass().getMethod("lambda", null).invoke(childKlass, null));
     }
 
-
-
     /* The `lambda` form should expect exactly two arguments. */
     @Test(expected = LispException.class)
     public void testLambdaNumbeOfArguments() {
-        
+
         Object[] ast = (Object[]) parse("(lambda (foo) (bar) (baz))");
-        
+
         CompilerContext env = new CompilerContext().defineVariable("foo", 42);
         CompiledClosure closure = (CompiledClosure) LispCompiler.compileBlock(ast, env);
 
@@ -103,12 +101,12 @@ public class FunctionsTest {
         CompiledClosure closure = (CompiledClosure) LispCompiler.compileBlock(ast, env);
     }
 
-
     /**
      * @TODO: UPdate doc
-     * 
-     * One of the tricks is that a body IS cmpiled as opposed to the evaluator where it is interpreted lazily.
-    */
+     *
+     * One of the tricks is that a body IS cmpiled as opposed to the evaluator
+     * where it is interpreted lazily.
+     */
     @Test(expected = LispException.class)
     public void testBodyIsCompiled() {
         Object[] ast = (Object[]) parse("(lambda (foo) (function body ((that) would never) work))");
@@ -152,16 +150,37 @@ public class FunctionsTest {
 
     @Test
     public void testCallLambdaClosure() throws Exception {
-        Object ast = (Object[]) parse("((lambda () 42))");
-        
+        Object ast = (Object[]) parse("((lambda () 42)())");
+
         Class klass = LispCompiler.compile(ast);
 
         Object instance = klass.newInstance();
-        
+
         Method lambdaMethod = klass.getMethod("main", new Class<?>[0]);
 
         assertEquals(42, lambdaMethod.invoke(instance, new Object[0]));
     }
+
+    
+    /*
+     * It should be possible to define and call functions directly.
+     * 
+     * A lambda definition in the call position of an AST should be evaluated, and then
+     * evaluated as before.
+     */
+    @Test
+    public void testCallingLambdaDirectly() throws Exception {
+        Object[] ast = (Object[]) (Object[]) parse("((lambda (x) x) 42)");
+
+        Class klass = LispCompiler.compile(ast);
+
+        Object instance = klass.newInstance();
+
+        Method lambdaMethod = klass.getMethod("main", new Class<?>[0]);
+
+        assertEquals(42, lambdaMethod.invoke(instance, new Object[0]));
+    }
+
     
     /*
      * Call to function should evaluate all arguments.
@@ -170,44 +189,21 @@ public class FunctionsTest {
      * to the parameter names.
      */
     @Test
-    public void testCallToFunctionShouldEvaluateArguments() {
-//        Environment env = new Environment();
-//        Closure closure = (Closure) evaluate((Object[]) parse("(lambda (a) (+ a 5))"), env);
-//
-//        List<Object> list = new ArrayList(2);
-//        list.add(closure);
-//        list.add(parse("(if #f 0 (+ 10 10))"));
-//        assertEquals(25, evaluate(list.toArray(), env));
-        throw new RuntimeException("Not implemented");
-        
-        
-        
-        
-        
+    public void testCallToFunctionShouldEvaluateArguments() throws Exception {
+        Object ast = (Object[]) parse("((lambda (a) (+ a 5))(if #f 0 (+ 10 10)))");
+
+        Class klass = LispCompiler.compile(ast);
+
+        Object instance = klass.newInstance();
+
+        Method lambdaMethod = klass.getMethod("main", new Class<?>[0]);
+
+        assertEquals(25, lambdaMethod.invoke(instance, new Object[0]));
+
     }
 
-    /*
-     * The body should be evaluated in the environment from the closure.
-     * 
-     * The function's free variables, i.e. those not specified as part of the parameter list,
-     * should be looked up in the environment from where the function was defined. This is
-     * the environment included in the closure. Make sure this environment is used when
-     * evaluating the body.
-     */
-    @Test
-    public void testCallToFunctionWithFreeVariables() {
-//        Environment env = new Environment();
-//        env.set("y", 1);
-//        Closure closure = (Closure) evaluate((Object[]) parse("(lambda (x) (+ x y))"), env);
-//        Object[] ast = new Object[]{closure, 0};
-//
-//        env = new Environment();
-//        env.set("y", 2);
-//
-//        assertEquals(1, evaluate(ast, env));
-        throw new RuntimeException("Not implemented");
-    }
 
+    
     /*
      * """
      * Okay, now we're able to evaluate ASTs with closures as the first element. But normally
@@ -228,29 +224,13 @@ public class FunctionsTest {
      */
     @Test
     public void testSimpleFunctionInEnvironment() {
+        Object ast = (Object[]) parse("(define add (lambda (x y) (+ x y)))");
+        CompilerContext context = new CompilerContext();
+        LispCompiler.compileBlock(ast, context);
+        Class klass = toClass(context);
 
-//        Environment env = new Environment();
-//        env.set("y", 1);
-//
-//        evaluate((Object[]) parse("(define add (lambda (x y) (+ x y)))"), env);
-//
-//        assertTrue(env.lookup("add") instanceof Closure);
-//        assertEquals(3, evaluate((Object[]) parse("(add 1 2)"), env));
-        throw new RuntimeException("Not implemented");
-    }
+        assertTrue(context.lookup("add") instanceof CompiledClosure);
 
-    /*
-     * It should be possible to define and call functions directly.
-     * 
-     * A lambda definition in the call position of an AST should be evaluated, and then
-     * evaluated as before.
-     */
-    @Test
-    public void testCallingLambdaDirectly() {
-//        Object[] ast = (Object[]) (Object[]) parse("((lambda (x) x) 42)");
-//        Object result = evaluate(ast, new Environment());
-//        assertEquals(42, result);
-        throw new RuntimeException("Not implemented");
     }
 
     /*
@@ -262,16 +242,20 @@ public class FunctionsTest {
      * already know how to evaluate.
      */
     @Test
-    public void testCallingComplexExpressionWhichEvaluatesToFunction() {
-//        Object[] ast = (Object[]) (Object[]) parse(" ((if #f\n"
-//                + "wont-evaluate-this-branch\n"
-//                + "(lambda (x) (+ x y)))\n"
-//                + "2)");
-//
-//        Environment env = new Environment();
-//        env.set("y", 3);
-//        assertEquals(5, evaluate(ast, env));
-        throw new RuntimeException("Not implemented");
+    public void testCallingComplexExpressionWhichEvaluatesToFunction() throws Exception{
+        Object[] ast = (Object[]) (Object[]) parse(" ((if #f\n"
+                + "('42)\n"
+                + "(lambda (x) (+ x 23)))\n"
+                + "'2)");
+
+        
+        Class klass = LispCompiler.compile(ast);
+
+        Object instance = klass.newInstance();
+
+        Method lambdaMethod = klass.getMethod("main", new Class<?>[0]);
+
+        assertEquals(25, lambdaMethod.invoke(instance, new Object[0]));
     }
 
     /*

@@ -81,8 +81,10 @@ public class CompilerContext {
             variables.put(variableName, value);
         }
 
-        jiteClass.defineField(variableName, Opcodes.ACC_PUBLIC, CodegenUtils.ci(Object.class), value);
-
+        if (!(value instanceof CompiledClosure)) {
+            jiteClass.defineField(variableName, Opcodes.ACC_PUBLIC, CodegenUtils.ci(Object.class), value);
+        }
+        
         return this;
 
     }
